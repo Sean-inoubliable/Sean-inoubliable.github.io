@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  
+  <url>
+    <loc>http://www.some-note.cn/category/index.html</loc>
+    
+    <lastmod>2020-06-16T07:49:34.910Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.some-note.cn/tag/index.html</loc>
+    
+    <lastmod>2020-06-16T07:49:08.068Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.some-note.cn/2020/06/16/Nginx%E5%BC%80%E7%AF%87%E7%AE%80%E4%BB%8B/</loc>
+    
+    <lastmod>2020-06-16T07:46:10.296Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>http://www.some-note.cn/2020/06/15/hello-world/</loc>
+    
+    <lastmod>2020-06-15T07:14:02.046Z</lastmod>
+    
+  </url>
+  
+</urlset>
