@@ -12,7 +12,7 @@
 
 
 
-<title>Hello World | sean&#39;s home</title>
+<title>Nginx开篇简介 | sean&#39;s home</title>
 
 
 
@@ -173,7 +173,7 @@
     
     <article class="post-wrap">
         <header class="post-header">
-            <h1 class="post-title">Hello World</h1>
+            <h1 class="post-title">Nginx开篇简介</h1>
             
                 <div class="post-meta">
                     
@@ -182,7 +182,7 @@
 
                     
                         <span class="post-time">
-                        Date: <a href="#">June 15, 2020&nbsp;&nbsp;15:14:02</a>
+                        Date: <a href="#">June 16, 2020&nbsp;&nbsp;10:22:55</a>
                         </span>
                     
                     
@@ -191,19 +191,38 @@
         </header>
 
         <div class="post-content">
-            <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+            <blockquote>
+<p>Web服务器 - 反向代理服务器</p>
+</blockquote>
+<ul>
+<li>简介</li>
+<li>环境搭建</li>
+<li>配置文件</li>
+<li>主要应用</li>
+<li>静态网站</li>
+<li>负载均衡</li>
+<li>静态代理</li>
+<li>动静分离</li>
+<li>虚拟主机</li>
+</ul>
+<hr>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ol>
+<li>高性能的Web服务器和反向代理服务器, 也可作为邮件代理服务器</li>
+<li>俄罗斯人 Igor Sysoev 采用C语言开发编写, First - 2004/10/04</li>
+<li>特点: 占有内存少 / 并发处理能力强 / 高性能 / 低系统资源消耗 / 官方测试 - 5万并发请求</li>
+<li>同类型的Web服务器: Apache / Lighttpd / Tengine等</li>
+<li>并发处理能力在同类型Web服务器中为最佳选择</li>
+<li>免费开源 / 同时其商业版本提供性能优化, 宕机等紧急问题处理等技术支持和服务</li>
+</ol>
+<h2 id="Nginx反向代理-Reverse-Proxy"><a href="#Nginx反向代理-Reverse-Proxy" class="headerlink" title="Nginx反向代理 (Reverse Proxy)"></a>Nginx反向代理 (Reverse Proxy)</h2><blockquote>
+<p>以反向代理服务器来接收 Internet 上的链接请求, 然后将请求转发给内部网络上的服务器, 并将从服务器上得到的结果返回给 Internet 上请求链接的客户端, 此时代理服务器对外表现为一个<strong><em>反向代理服务器</em></strong><br><img src="E:/privarte/projectFile/inoubliable-blog/images/Nginx%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86.png" alt="image"></p>
+</blockquote>
+<h2 id="正向代理"><a href="#正向代理" class="headerlink" title="正向代理"></a>正向代理</h2><blockquote>
+<p>类似一个跳板机, ‘代理访问外部资源’, 通过访问代理服务器, 获取无法访问网站的内容</p>
+</blockquote>
+<h2 id="正反区别"><a href="#正反区别" class="headerlink" title="正反区别"></a>正反区别</h2><blockquote>
+<p>是否知道其底层服务器的 <strong><em>ip</em></strong> , <strong><em>port</em></strong> 等</p>
+</blockquote>
 
         </div>
 
@@ -218,7 +237,7 @@
                 
                     <p class="copyright-item">
                         <span>Permalink:</span>
-                        <span><a href="http://www.some-note.cn/2020/06/15/hello-world/">http://www.some-note.cn/2020/06/15/hello-world/</a></span>
+                        <span><a href="http://www.some-note.cn/2020/06/16/Nginx%E5%BC%80%E7%AF%87%E7%AE%80%E4%BB%8B/">http://www.some-note.cn/2020/06/16/Nginx%E5%BC%80%E7%AF%87%E7%AE%80%E4%BB%8B/</a></span>
                     </p>
                 
                 
@@ -251,8 +270,8 @@
         </section>
         <section class="post-nav">
             
-                <a class="prev" rel="prev" href="/2020/06/16/Nginx%E5%BC%80%E7%AF%87%E7%AE%80%E4%BB%8B/">Nginx开篇简介</a>
             
+            <a class="next" rel="next" href="/2020/06/15/hello-world/">Hello World</a>
             
         </section>
 
