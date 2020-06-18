@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.some-note.cn/"/>
-  <updated>2020-06-18T09:11:40.707Z</updated>
+  <updated>2020-06-18T09:13:30.876Z</updated>
   <id>http://www.some-note.cn/</id>
   
   <author>
@@ -21,7 +21,7 @@
     <link href="http://www.some-note.cn/2020/06/18/Ngxin%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/"/>
     <id>http://www.some-note.cn/2020/06/18/Ngxin%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/</id>
     <published>2020-06-18T09:06:31.000Z</published>
-    <updated>2020-06-18T09:11:40.707Z</updated>
+    <updated>2020-06-18T09:13:30.876Z</updated>
     
     <content type="html"><![CDATA[<blockquote><p>学习 <strong>Nginx</strong>, 首先需要对它的核心配置文件 nginx.conf 有一定认识</p></blockquote><blockquote><p>Nginx 的核心配置文件主要由三个部分构成</p></blockquote><p><strong><em>基本配置</em></strong> / <strong><em>events配置</em></strong> / <strong><em>http配置( 基本配置 / 多个server配置 )</em></strong></p><ul><li>看下图</li></ul><p>  <img src="/images/nginx%E9%85%8D%E7%BD%AE%E4%B8%AD%E6%96%87%E8%AF%A6%E8%A7%A3.png" alt=""></p>]]></content>
     
