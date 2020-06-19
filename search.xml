@@ -172,4 +172,25 @@
 <p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p>
 ]]></content>
   </entry>
+  <entry>
+    <title>Nginx主要应用</title>
+    <url>/2020/06/19/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8/</url>
+    <content><![CDATA[<blockquote>
+<p>主要是应用配置文件来实现</p>
+</blockquote>
+<ul>
+<li>静态网站</li>
+<li>负载均衡</li>
+<li>静态代理</li>
+<li>动静分离</li>
+<li>虚拟主机</li>
+</ul>
+]]></content>
+      <categories>
+        <category>Nginx</category>
+      </categories>
+      <tags>
+        <tag>Nginx</tag>
+      </tags>
+  </entry>
 </search>

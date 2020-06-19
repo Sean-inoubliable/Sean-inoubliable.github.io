@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.some-note.cn/"/>
-  <updated>2020-06-18T09:13:30.876Z</updated>
+  <updated>2020-06-19T06:37:05.720Z</updated>
   <id>http://www.some-note.cn/</id>
   
   <author>
@@ -15,6 +15,42 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Nginx主要应用</title>
+    <link href="http://www.some-note.cn/2020/06/19/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8/"/>
+    <id>http://www.some-note.cn/2020/06/19/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8/</id>
+    <published>2020-06-19T06:36:34.000Z</published>
+    <updated>2020-06-19T06:37:05.720Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote><p>主要是应用配置文件来实现</p></blockquote><ul><li>静态网站</li><li>负载均衡</li><li>静态代理</li><li>动静分离</li><li>虚拟主机</li></ul>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;blockquote&gt;
+&lt;p&gt;主要是应用配置文件来实现&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;静态网站&lt;/li&gt;
+&lt;li&gt;负载均衡&lt;/li&gt;
+&lt;li&gt;静态代理&lt;/li&gt;
+&lt;li&gt;动静分离&lt;/li&gt;
+&lt;li&gt;虚拟主机&lt;/li&gt;
+&lt;/ul&gt;
+
+      
+    
+    </summary>
+    
+    
+      <category term="Nginx" scheme="http://www.some-note.cn/category/Nginx/"/>
+    
+    
+      <category term="Nginx" scheme="http://www.some-note.cn/tag/Nginx/"/>
+    
+  </entry>
   
   <entry>
     <title>Ngxin配置文件</title>
