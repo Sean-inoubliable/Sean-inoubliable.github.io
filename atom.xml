@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.some-note.cn/"/>
-  <updated>2020-06-19T06:37:05.720Z</updated>
+  <updated>2020-06-22T03:34:55.194Z</updated>
   <id>http://www.some-note.cn/</id>
   
   <author>
@@ -15,6 +15,37 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Nginx主要应用 - 静态网站</title>
+    <link href="http://www.some-note.cn/2020/06/22/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E9%9D%99%E6%80%81%E7%BD%91%E7%AB%99/"/>
+    <id>http://www.some-note.cn/2020/06/22/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E9%9D%99%E6%80%81%E7%BD%91%E7%AB%99/</id>
+    <published>2020-06-22T03:33:46.000Z</published>
+    <updated>2020-06-22T03:34:55.194Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote><p>Nginx 是一个 HTTP 的 Web 服务器, 可以将服务器上的静态文件 (如html / img等) 通过 HTTP 协议返回给浏览器客户端</p></blockquote><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># IP + Port &#x3D; root</span><br><span class="line">server &#123;</span><br><span class="line">    listen 80; # 端口号</span><br><span class="line">    location &#x2F; &#123;</span><br><span class="line">        root &#x2F;opt&#x2F;www&#x2F;; # 静态文件路径</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;blockquote&gt;
+&lt;p&gt;Nginx 是一个 HTTP 的 Web 服务器, 可以将服务器上的静态文件 (如html / img等) 通过 HTTP 协议返回给浏览器客户端&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;
+      
+    
+    </summary>
+    
+    
+      <category term="Nginx" scheme="http://www.some-note.cn/category/Nginx/"/>
+    
+    
+      <category term="Nginx配置" scheme="http://www.some-note.cn/tag/Nginx%E9%85%8D%E7%BD%AE/"/>
+    
+      <category term="Nginx应用" scheme="http://www.some-note.cn/tag/Nginx%E5%BA%94%E7%94%A8/"/>
+    
+  </entry>
   
   <entry>
     <title>Nginx主要应用</title>
@@ -57,7 +88,7 @@
     <link href="http://www.some-note.cn/2020/06/18/Ngxin%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/"/>
     <id>http://www.some-note.cn/2020/06/18/Ngxin%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/</id>
     <published>2020-06-18T09:06:31.000Z</published>
-    <updated>2020-06-18T09:13:30.876Z</updated>
+    <updated>2020-06-22T03:36:04.024Z</updated>
     
     <content type="html"><![CDATA[<blockquote><p>学习 <strong>Nginx</strong>, 首先需要对它的核心配置文件 nginx.conf 有一定认识</p></blockquote><blockquote><p>Nginx 的核心配置文件主要由三个部分构成</p></blockquote><p><strong><em>基本配置</em></strong> / <strong><em>events配置</em></strong> / <strong><em>http配置( 基本配置 / 多个server配置 )</em></strong></p><ul><li>看下图</li></ul><p>  <img src="/images/nginx%E9%85%8D%E7%BD%AE%E4%B8%AD%E6%96%87%E8%AF%A6%E8%A7%A3.png" alt=""></p>]]></content>
     
@@ -81,7 +112,7 @@
     
       <category term="Nginx" scheme="http://www.some-note.cn/tag/Nginx/"/>
     
-      <category term="Nginx配置文件" scheme="http://www.some-note.cn/tag/Nginx%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/"/>
+      <category term="Nginx配置" scheme="http://www.some-note.cn/tag/Nginx%E9%85%8D%E7%BD%AE/"/>
     
   </entry>
   

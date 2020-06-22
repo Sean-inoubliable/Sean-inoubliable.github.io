@@ -129,7 +129,7 @@
       </categories>
       <tags>
         <tag>Nginx</tag>
-        <tag>Nginx配置文件</tag>
+        <tag>Nginx配置</tag>
       </tags>
   </entry>
   <entry>
@@ -191,6 +191,21 @@
       </categories>
       <tags>
         <tag>Nginx</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Nginx主要应用 - 静态网站</title>
+    <url>/2020/06/22/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E9%9D%99%E6%80%81%E7%BD%91%E7%AB%99/</url>
+    <content><![CDATA[<blockquote>
+<p>Nginx 是一个 HTTP 的 Web 服务器, 可以将服务器上的静态文件 (如html / img等) 通过 HTTP 协议返回给浏览器客户端</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># IP + Port &#x3D; root</span><br><span class="line">server &#123;</span><br><span class="line">    listen 80; # 端口号</span><br><span class="line">    location &#x2F; &#123;</span><br><span class="line">        root &#x2F;opt&#x2F;www&#x2F;; # 静态文件路径</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>Nginx</category>
+      </categories>
+      <tags>
+        <tag>Nginx配置</tag>
+        <tag>Nginx应用</tag>
       </tags>
   </entry>
 </search>
