@@ -15,7 +15,7 @@
 <p>通过在 Nginx 的 nginx.conf 文件进行 <strong>配置</strong> 即可实现</p>
 </blockquote>
 <ul>
-<li>下为Nginx负载简易图<br><img src="F:/entryCoder/Image/Nginx%E8%B4%9F%E8%BD%BD%E7%AE%80%E6%98%93%E5%9B%BE.png" alt="image"></li>
+<li>下为Nginx负载简易图<br><img src="/images/Nginx%E8%B4%9F%E8%BD%BD%E7%AE%80%E6%98%93%E5%9B%BE.png" alt=""></li>
 </ul>
 <h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><h4 id="1-在-http-模块添加-例"><a href="#1-在-http-模块添加-例" class="headerlink" title="1. 在 http 模块添加 ( 例 )"></a>1. 在 http 模块添加 ( 例 )</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># upstream 的名字, 一般定为域名</span><br><span class="line">upstream www.sean.com &#123; </span><br><span class="line">#对应 Tomcat 的 IP &amp; Port</span><br><span class="line">    server 127.0.0.1:9100 weight&#x3D;3; </span><br><span class="line">#有几个 Tomcat, 就配几个 server</span><br><span class="line">    server 127.0.0.1:9200 weight&#x3D;1; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <blockquote>
