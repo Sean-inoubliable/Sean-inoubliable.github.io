@@ -17,9 +17,6 @@
       <categories>
         <category>Nginx</category>
       </categories>
-      <tags>
-        <tag>Nginx</tag>
-      </tags>
   </entry>
   <entry>
     <title>Nginx环境搭建</title>
@@ -105,8 +102,7 @@
         <category>Nginx</category>
       </categories>
       <tags>
-        <tag>Nginx</tag>
-        <tag>Nginx环境搭建</tag>
+        <tag>环境搭建</tag>
       </tags>
   </entry>
   <entry>
@@ -128,8 +124,7 @@
         <category>Nginx</category>
       </categories>
       <tags>
-        <tag>Nginx</tag>
-        <tag>Nginx配置</tag>
+        <tag>配置</tag>
       </tags>
   </entry>
   <entry>
@@ -190,7 +185,7 @@
         <category>Nginx</category>
       </categories>
       <tags>
-        <tag>Nginx</tag>
+        <tag>简介</tag>
       </tags>
   </entry>
   <entry>
@@ -204,8 +199,81 @@
         <category>Nginx</category>
       </categories>
       <tags>
-        <tag>Nginx配置</tag>
-        <tag>Nginx应用</tag>
+        <tag>静态网站</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Nginx主要应用 - 负载均衡</title>
+    <url>/2020/06/29/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><ul>
+<li>将用户输入的 http 网址请求分发到集群中不同的机器上, 这就是负载均衡要做的事情</li>
+<li>负载均衡通常是指将请求 ‘均匀’ 分推到集群中多个服务器节点上进行执行, 这里的均匀是指在一个比较大的统计范围内是基本均匀的, 并不是完全均匀</li>
+</ul>
+<h2 id="实现方式"><a href="#实现方式" class="headerlink" title="实现方式"></a>实现方式</h2><h3 id="硬件负载均衡"><a href="#硬件负载均衡" class="headerlink" title="硬件负载均衡"></a>硬件负载均衡</h3><ul>
+<li>比如 : F5 / 深信服 / Array等</li>
+<li>优点 : 有厂商专业的技术服务团队提供支持, 性能稳定</li>
+<li>缺点 : 费用昂贵, 对于规模较小的网络应用成本太高</li>
+</ul>
+<h3 id="软件负载均衡"><a href="#软件负载均衡" class="headerlink" title="软件负载均衡"></a>软件负载均衡</h3><ul>
+<li>比如 : Nginx / LVS / HAProxy等</li>
+<li>优点 : 免费开源, 成本低廉</li>
+</ul>
+<h2 id="Nginx负载均衡"><a href="#Nginx负载均衡" class="headerlink" title="Nginx负载均衡"></a>Nginx负载均衡</h2><h3 id="如何实现"><a href="#如何实现" class="headerlink" title="如何实现"></a>如何实现</h3><blockquote>
+<p>通过在 Nginx 的 nginx.conf 文件进行 <strong>配置</strong> 即可实现</p>
+</blockquote>
+<ul>
+<li>下为Nginx负载简易图<br><img src="F:/entryCoder/Image/Nginx%E8%B4%9F%E8%BD%BD%E7%AE%80%E6%98%93%E5%9B%BE.png" alt="image"></li>
+</ul>
+<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><h4 id="1-在-http-模块添加-例"><a href="#1-在-http-模块添加-例" class="headerlink" title="1. 在 http 模块添加 ( 例 )"></a>1. 在 http 模块添加 ( 例 )</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># upstream 的名字, 一般定为域名</span><br><span class="line">upstream www.sean.com &#123; </span><br><span class="line">#对应 Tomcat 的 IP &amp; Port</span><br><span class="line">    server 127.0.0.1:9100 weight&#x3D;3; </span><br><span class="line">#有几个 Tomcat, 就配几个 server</span><br><span class="line">    server 127.0.0.1:9200 weight&#x3D;1; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<ul>
+<li>其中 <strong>weight</strong> 表示权重, 用于后端服务器性能不均的情况, 访问比率约等于权重之比, 权重越大访问机会越多</li>
+<li><strong>upstream</strong> 是配置 <strong>Nginx</strong> 与后端服务器负载均衡非常重要的一个模块. 并且它还能对后端服务器的健康状况进行检查, 若后端服务器中的一台发生故障, 则前端的请求不会转发到该故障的机器</li>
+</ul>
+</blockquote>
+<h4 id="2-在server模块里添加-例"><a href="#2-在server模块里添加-例" class="headerlink" title="2. 在server模块里添加 ( 例 )"></a>2. 在server模块里添加 ( 例 )</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># www.sean.com字符串要与upstream后面的字符串相等</span><br><span class="line">location &#x2F;sean &#123; # 项目路径</span><br><span class="line">    proxy_pass http:&#x2F;&#x2F;www.sean.com; # 代理转发</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Nginx常用负载均衡策略"><a href="#Nginx常用负载均衡策略" class="headerlink" title="Nginx常用负载均衡策略"></a>Nginx常用负载均衡策略</h2><blockquote>
+<p><strong>轮询(默认)</strong> / <strong>权重</strong> / <strong>ip_hash</strong> / <strong>最少链接</strong></p>
+</blockquote>
+<h3 id="1-轮询"><a href="#1-轮询" class="headerlink" title="1. 轮询"></a>1. 轮询</h3><blockquote>
+<p>每个请求轮流分配到不同的后端服务器, 如果后端服务器down掉, 将自动剔除</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 无 weight</span><br><span class="line">upstream sean &#123;</span><br><span class="line">    server 127.0.0.1:8080;</span><br><span class="line">    server 127.0.0.1:9090;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-权重"><a href="#2-权重" class="headerlink" title="2. 权重"></a>2. 权重</h3><blockquote>
+<p>每个请求按一定比例分发到不同的服务器, <strong>weight</strong> 值越大 访问的比例越大, 用于后端服务器性能不均的情况</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 有 weight</span><br><span class="line">upstream sean &#123;</span><br><span class="line">    server 192.168.0.14 weight&#x3D;5;</span><br><span class="line">    server 192.168.0.15 weight&#x3D;2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-ip-hash"><a href="#3-ip-hash" class="headerlink" title="3. ip_hash"></a>3. ip_hash</h3><blockquote>
+<p>也叫 IP 绑定, 每个请求按访问 <strong>IP的hash值</strong> 分配, 这样每个访问 客户端都会固定访问一个后端服务器, 可以解决 <strong>会话session</strong> 丢失的问题</p>
+</blockquote>
+<ul>
+<li>使用源地址哈希算法, 将同一客户端的请求总是发往同一后端服务器, 除非该服务器不可用</li>
+<li>类似 : hash(“124.207.55.82”) % 2 = ?  (0 | 1)</li>
+</ul>
+<h4 id="存在问题"><a href="#存在问题" class="headerlink" title="存在问题"></a>存在问题</h4><blockquote>
+<ul>
+<li>当后端服务器宕机, session会丢失; </li>
+<li>来自同一局域网的客户端会被转发到同一后端服务器, 可能导致负载失衡; </li>
+<li>不适用于 CDN 网络</li>
+</ul>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">upstream sean &#123;</span><br><span class="line">    ip_hash;</span><br><span class="line">    server 127.0.0.1:8080;</span><br><span class="line">    server 127.0.0.1:9090;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-最少链接"><a href="#4-最少链接" class="headerlink" title="4. 最少链接"></a>4. 最少链接</h3><blockquote>
+<p>Web请求会被转发到连接数最少的服务器上</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">upstream sean &#123;</span><br><span class="line">    least_conn;</span><br><span class="line">    server 127.0.0.1:8080;</span><br><span class="line">    server 127.0.0.1:9090;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="负载均衡其他几个配置"><a href="#负载均衡其他几个配置" class="headerlink" title="负载均衡其他几个配置"></a>负载均衡其他几个配置</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 其他所有非 backup 机器 down 机的时候, 才会请求 backup 机器, 俗称 &#39;备胎&#39;</span><br><span class="line"># backup 可用在上线期间更新产品 , reload</span><br><span class="line">upstream sean &#123;</span><br><span class="line">    server 127.0.0.1:9100;</span><br><span class="line">    server 127.0.0.1:9200 backup;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># down 表示当前的 server 是 down 状态, 不参与负载均衡</span><br><span class="line">upstream sean &#123;</span><br><span class="line">    server 127.0.0.1:9100;</span><br><span class="line">    server 127.0.0.1:9200 down;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>Nginx</category>
+      </categories>
+      <tags>
+        <tag>负载均衡</tag>
       </tags>
   </entry>
 </search>

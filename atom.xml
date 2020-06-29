@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.some-note.cn/"/>
-  <updated>2020-06-22T03:34:55.194Z</updated>
+  <updated>2020-06-29T07:48:15.147Z</updated>
   <id>http://www.some-note.cn/</id>
   
   <author>
@@ -17,11 +17,39 @@
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>Nginx主要应用 - 负载均衡</title>
+    <link href="http://www.some-note.cn/2020/06/29/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/"/>
+    <id>http://www.some-note.cn/2020/06/29/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/</id>
+    <published>2020-06-29T07:41:35.000Z</published>
+    <updated>2020-06-29T07:48:15.147Z</updated>
+    
+    <content type="html"><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><ul><li>将用户输入的 http 网址请求分发到集群中不同的机器上, 这就是负载均衡要做的事情</li><li>负载均衡通常是指将请求 ‘均匀’ 分推到集群中多个服务器节点上进行执行, 这里的均匀是指在一个比较大的统计范围内是基本均匀的, 并不是完全均匀</li></ul><h2 id="实现方式"><a href="#实现方式" class="headerlink" title="实现方式"></a>实现方式</h2><h3 id="硬件负载均衡"><a href="#硬件负载均衡" class="headerlink" title="硬件负载均衡"></a>硬件负载均衡</h3><ul><li>比如 : F5 / 深信服 / Array等</li><li>优点 : 有厂商专业的技术服务团队提供支持, 性能稳定</li><li>缺点 : 费用昂贵, 对于规模较小的网络应用成本太高</li></ul><h3 id="软件负载均衡"><a href="#软件负载均衡" class="headerlink" title="软件负载均衡"></a>软件负载均衡</h3><ul><li>比如 : Nginx / LVS / HAProxy等</li><li>优点 : 免费开源, 成本低廉</li></ul><h2 id="Nginx负载均衡"><a href="#Nginx负载均衡" class="headerlink" title="Nginx负载均衡"></a>Nginx负载均衡</h2><h3 id="如何实现"><a href="#如何实现" class="headerlink" title="如何实现"></a>如何实现</h3><blockquote><p>通过在 Nginx 的 nginx.conf 文件进行 <strong>配置</strong> 即可实现</p></blockquote><ul><li>下为Nginx负载简易图<br><img src="F:/entryCoder/Image/Nginx%E8%B4%9F%E8%BD%BD%E7%AE%80%E6%98%93%E5%9B%BE.png" alt="image"></li></ul><h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><h4 id="1-在-http-模块添加-例"><a href="#1-在-http-模块添加-例" class="headerlink" title="1. 在 http 模块添加 ( 例 )"></a>1. 在 http 模块添加 ( 例 )</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># upstream 的名字, 一般定为域名</span><br><span class="line">upstream www.sean.com &#123; </span><br><span class="line">#对应 Tomcat 的 IP &amp; Port</span><br><span class="line">    server 127.0.0.1:9100 weight&#x3D;3; </span><br><span class="line">#有几个 Tomcat, 就配几个 server</span><br><span class="line">    server 127.0.0.1:9200 weight&#x3D;1; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><blockquote><ul><li>其中 <strong>weight</strong> 表示权重, 用于后端服务器性能不均的情况, 访问比率约等于权重之比, 权重越大访问机会越多</li><li><strong>upstream</strong> 是配置 <strong>Nginx</strong> 与后端服务器负载均衡非常重要的一个模块. 并且它还能对后端服务器的健康状况进行检查, 若后端服务器中的一台发生故障, 则前端的请求不会转发到该故障的机器</li></ul></blockquote><h4 id="2-在server模块里添加-例"><a href="#2-在server模块里添加-例" class="headerlink" title="2. 在server模块里添加 ( 例 )"></a>2. 在server模块里添加 ( 例 )</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># www.sean.com字符串要与upstream后面的字符串相等</span><br><span class="line">location &#x2F;sean &#123; # 项目路径</span><br><span class="line">    proxy_pass http:&#x2F;&#x2F;www.sean.com; # 代理转发</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h2 id="Nginx常用负载均衡策略"><a href="#Nginx常用负载均衡策略" class="headerlink" title="Nginx常用负载均衡策略"></a>Nginx常用负载均衡策略</h2><blockquote><p><strong>轮询(默认)</strong> / <strong>权重</strong> / <strong>ip_hash</strong> / <strong>最少链接</strong></p></blockquote><h3 id="1-轮询"><a href="#1-轮询" class="headerlink" title="1. 轮询"></a>1. 轮询</h3><blockquote><p>每个请求轮流分配到不同的后端服务器, 如果后端服务器down掉, 将自动剔除</p></blockquote><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 无 weight</span><br><span class="line">upstream sean &#123;</span><br><span class="line">    server 127.0.0.1:8080;</span><br><span class="line">    server 127.0.0.1:9090;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h3 id="2-权重"><a href="#2-权重" class="headerlink" title="2. 权重"></a>2. 权重</h3><blockquote><p>每个请求按一定比例分发到不同的服务器, <strong>weight</strong> 值越大 访问的比例越大, 用于后端服务器性能不均的情况</p></blockquote><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 有 weight</span><br><span class="line">upstream sean &#123;</span><br><span class="line">    server 192.168.0.14 weight&#x3D;5;</span><br><span class="line">    server 192.168.0.15 weight&#x3D;2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h3 id="3-ip-hash"><a href="#3-ip-hash" class="headerlink" title="3. ip_hash"></a>3. ip_hash</h3><blockquote><p>也叫 IP 绑定, 每个请求按访问 <strong>IP的hash值</strong> 分配, 这样每个访问 客户端都会固定访问一个后端服务器, 可以解决 <strong>会话session</strong> 丢失的问题</p></blockquote><ul><li>使用源地址哈希算法, 将同一客户端的请求总是发往同一后端服务器, 除非该服务器不可用</li><li>类似 : hash(“124.207.55.82”) % 2 = ?  (0 | 1)</li></ul><h4 id="存在问题"><a href="#存在问题" class="headerlink" title="存在问题"></a>存在问题</h4><blockquote><ul><li>当后端服务器宕机, session会丢失; </li><li>来自同一局域网的客户端会被转发到同一后端服务器, 可能导致负载失衡; </li><li>不适用于 CDN 网络</li></ul></blockquote><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">upstream sean &#123;</span><br><span class="line">    ip_hash;</span><br><span class="line">    server 127.0.0.1:8080;</span><br><span class="line">    server 127.0.0.1:9090;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h3 id="4-最少链接"><a href="#4-最少链接" class="headerlink" title="4. 最少链接"></a>4. 最少链接</h3><blockquote><p>Web请求会被转发到连接数最少的服务器上</p></blockquote><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">upstream sean &#123;</span><br><span class="line">    least_conn;</span><br><span class="line">    server 127.0.0.1:8080;</span><br><span class="line">    server 127.0.0.1:9090;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h2 id="负载均衡其他几个配置"><a href="#负载均衡其他几个配置" class="headerlink" title="负载均衡其他几个配置"></a>负载均衡其他几个配置</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 其他所有非 backup 机器 down 机的时候, 才会请求 backup 机器, 俗称 &#39;备胎&#39;</span><br><span class="line"># backup 可用在上线期间更新产品 , reload</span><br><span class="line">upstream sean &#123;</span><br><span class="line">    server 127.0.0.1:9100;</span><br><span class="line">    server 127.0.0.1:9200 backup;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># down 表示当前的 server 是 down 状态, 不参与负载均衡</span><br><span class="line">upstream sean &#123;</span><br><span class="line">    server 127.0.0.1:9100;</span><br><span class="line">    server 127.0.0.1:9200 down;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h2 id=&quot;概述&quot;&gt;&lt;a href=&quot;#概述&quot; class=&quot;headerlink&quot; title=&quot;概述&quot;&gt;&lt;/a&gt;概述&lt;/h2&gt;&lt;ul&gt;
+&lt;li&gt;将用户输入的 http 网址请求分发到集群中不同的机器上, 这就是负载均衡要做的事情&lt;/li&gt;
+&lt;li&gt;负载均衡通常是指将请求 
+      
+    
+    </summary>
+    
+    
+      <category term="Nginx" scheme="http://www.some-note.cn/category/Nginx/"/>
+    
+    
+      <category term="负载均衡" scheme="http://www.some-note.cn/tag/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/"/>
+    
+  </entry>
+  
+  <entry>
     <title>Nginx主要应用 - 静态网站</title>
     <link href="http://www.some-note.cn/2020/06/22/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E9%9D%99%E6%80%81%E7%BD%91%E7%AB%99/"/>
     <id>http://www.some-note.cn/2020/06/22/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E9%9D%99%E6%80%81%E7%BD%91%E7%AB%99/</id>
     <published>2020-06-22T03:33:46.000Z</published>
-    <updated>2020-06-22T03:34:55.194Z</updated>
+    <updated>2020-06-29T07:45:35.561Z</updated>
     
     <content type="html"><![CDATA[<blockquote><p>Nginx 是一个 HTTP 的 Web 服务器, 可以将服务器上的静态文件 (如html / img等) 通过 HTTP 协议返回给浏览器客户端</p></blockquote><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># IP + Port &#x3D; root</span><br><span class="line">server &#123;</span><br><span class="line">    listen 80; # 端口号</span><br><span class="line">    location &#x2F; &#123;</span><br><span class="line">        root &#x2F;opt&#x2F;www&#x2F;; # 静态文件路径</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
     
@@ -41,9 +69,7 @@
       <category term="Nginx" scheme="http://www.some-note.cn/category/Nginx/"/>
     
     
-      <category term="Nginx配置" scheme="http://www.some-note.cn/tag/Nginx%E9%85%8D%E7%BD%AE/"/>
-    
-      <category term="Nginx应用" scheme="http://www.some-note.cn/tag/Nginx%E5%BA%94%E7%94%A8/"/>
+      <category term="静态网站" scheme="http://www.some-note.cn/tag/%E9%9D%99%E6%80%81%E7%BD%91%E7%AB%99/"/>
     
   </entry>
   
@@ -52,7 +78,7 @@
     <link href="http://www.some-note.cn/2020/06/19/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8/"/>
     <id>http://www.some-note.cn/2020/06/19/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8/</id>
     <published>2020-06-19T06:36:34.000Z</published>
-    <updated>2020-06-19T06:37:05.720Z</updated>
+    <updated>2020-06-29T07:45:40.495Z</updated>
     
     <content type="html"><![CDATA[<blockquote><p>主要是应用配置文件来实现</p></blockquote><ul><li>静态网站</li><li>负载均衡</li><li>静态代理</li><li>动静分离</li><li>虚拟主机</li></ul>]]></content>
     
@@ -79,8 +105,6 @@
       <category term="Nginx" scheme="http://www.some-note.cn/category/Nginx/"/>
     
     
-      <category term="Nginx" scheme="http://www.some-note.cn/tag/Nginx/"/>
-    
   </entry>
   
   <entry>
@@ -88,7 +112,7 @@
     <link href="http://www.some-note.cn/2020/06/18/Ngxin%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/"/>
     <id>http://www.some-note.cn/2020/06/18/Ngxin%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/</id>
     <published>2020-06-18T09:06:31.000Z</published>
-    <updated>2020-06-22T03:36:04.024Z</updated>
+    <updated>2020-06-29T07:43:54.814Z</updated>
     
     <content type="html"><![CDATA[<blockquote><p>学习 <strong>Nginx</strong>, 首先需要对它的核心配置文件 nginx.conf 有一定认识</p></blockquote><blockquote><p>Nginx 的核心配置文件主要由三个部分构成</p></blockquote><p><strong><em>基本配置</em></strong> / <strong><em>events配置</em></strong> / <strong><em>http配置( 基本配置 / 多个server配置 )</em></strong></p><ul><li>看下图</li></ul><p>  <img src="/images/nginx%E9%85%8D%E7%BD%AE%E4%B8%AD%E6%96%87%E8%AF%A6%E8%A7%A3.png" alt=""></p>]]></content>
     
@@ -110,9 +134,7 @@
       <category term="Nginx" scheme="http://www.some-note.cn/category/Nginx/"/>
     
     
-      <category term="Nginx" scheme="http://www.some-note.cn/tag/Nginx/"/>
-    
-      <category term="Nginx配置" scheme="http://www.some-note.cn/tag/Nginx%E9%85%8D%E7%BD%AE/"/>
+      <category term="配置" scheme="http://www.some-note.cn/tag/%E9%85%8D%E7%BD%AE/"/>
     
   </entry>
   
@@ -121,7 +143,7 @@
     <link href="http://www.some-note.cn/2020/06/17/Nginx%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/"/>
     <id>http://www.some-note.cn/2020/06/17/Nginx%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/</id>
     <published>2020-06-17T02:22:48.000Z</published>
-    <updated>2020-06-17T08:59:40.694Z</updated>
+    <updated>2020-06-29T07:45:14.725Z</updated>
     
     <content type="html"><![CDATA[<ul><li>下载</li><li>安装</li><li>番外</li></ul><h2 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h2><ul><li>免费开源 <a href="http://www.nginx.org" target="_blank" rel="noopener">Nginx免费开源地址</a></li><li>有 Windows 和 Linux 版本, 但推荐 Linux</li><li>下载 nginx … … tar.gz 的源代码文件, copy下方代码块并回车执行<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># &#39;... ...&#39; 确定要下载的版本, 建议先访问 &#39;Nginx免费开源地址挑选版本&#39;</span><br><span class="line">wget http:&#x2F;&#x2F;nginx.org&#x2F;download&#x2F;nginx ... ... tar.gz</span><br></pre></td></tr></table></figure></li></ul><h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><h3 id="安装前准备"><a href="#安装前准备" class="headerlink" title="安装前准备"></a>安装前准备</h3><blockquote><p><strong><em>Nginx的安装</em></strong> 需要Linux安装相关的几个库, 否则配置和编译会出现问题</p></blockquote><ol><li><strong>gcc 编译器</strong><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">yum list installed | grep gcc</span><br><span class="line">yum install gcc -y</span><br></pre></td></tr></table></figure></li><li><strong>openssl库</strong><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">yum list installed | grep openssl</span><br><span class="line">yum install openssl openssl-devel -y</span><br></pre></td></tr></table></figure></li><li><strong>pcre库</strong><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">yum list installed | grep pcre</span><br><span class="line">yum list install pcre pcre-devel -y</span><br></pre></td></tr></table></figure></li><li><strong>zlib库</strong><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">yum list installed | grep zlib</span><br><span class="line">yum install zlib zlib-devel -y</span><br></pre></td></tr></table></figure><blockquote><p>一次性安装, 命令:</p></blockquote><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># -y 表示自动确认 </span><br><span class="line">yum install gcc openssl openssl-devel pcre pcre-devel zlib zlib-devel -y</span><br></pre></td></tr></table></figure></li></ol><h3 id="正式安装"><a href="#正式安装" class="headerlink" title="正式安装"></a>正式安装</h3><ol><li>解压下载下来的 Nginx 文件<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 确定下载版本</span><br><span class="line">tar -zxvf nginx ... ... tar.gz</span><br></pre></td></tr></table></figure></li><li>切换至解压后的 Nginx 主目录<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd ... ...</span><br></pre></td></tr></table></figure></li><li>指定路径安装<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># --prefix 指定安装路径</span><br><span class="line">.&#x2F;configure --prefix &#x3D; &#x2F;usr&#x2F;local&#x2F;nginx</span><br></pre></td></tr></table></figure></li><li>编译<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 使用gcc编译</span><br><span class="line">make</span><br></pre></td></tr></table></figure></li><li>安装<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make install</span><br></pre></td></tr></table></figure><blockquote><p>安装后的文件夹</p></blockquote></li></ol><ul><li><strong>conf</strong> 配置, nginx.conf 核心</li><li><strong>html</strong> 服务器默认访问模版页</li><li><strong>logs</strong> 日志</li><li><strong>sbin</strong> nginx 启动程序</li></ul><hr><h2 id="番外篇"><a href="#番外篇" class="headerlink" title="番外篇"></a>番外篇</h2><h3 id="启动"><a href="#启动" class="headerlink" title="启动"></a>启动</h3><h4 id="1-普通启动-cd-到-nginx-的-sbin-目录下"><a href="#1-普通启动-cd-到-nginx-的-sbin-目录下" class="headerlink" title="1. 普通启动 ( cd 到 nginx 的 sbin 目录下 )"></a>1. 普通启动 ( cd 到 nginx 的 sbin 目录下 )</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 执行命令</span><br><span class="line">.&#x2F;nginx</span><br></pre></td></tr></table></figure><h4 id="2-通过配置文件启动"><a href="#2-通过配置文件启动" class="headerlink" title="2. 通过配置文件启动"></a>2. 通过配置文件启动</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># 启动程序 -c 配置文件</span><br></pre></td></tr></table></figure><h4 id="3-检查是否启动"><a href="#3-检查是否启动" class="headerlink" title="3. 检查是否启动"></a>3. 检查是否启动</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 由 master 和 worker 进程组成, master 进程读取配置文件并维护 worker 进程, worker 进程则对请求进行实际处理</span><br><span class="line">ps -ef | grep nginx</span><br></pre></td></tr></table></figure><h3 id="关闭-lt-多种方式-gt"><a href="#关闭-lt-多种方式-gt" class="headerlink" title="关闭 &lt;多种方式&gt;"></a>关闭 &lt;多种方式&gt;</h3><h4 id="1-优雅关闭"><a href="#1-优雅关闭" class="headerlink" title="1. 优雅关闭"></a>1. 优雅关闭</h4><blockquote><p>此方式不会影响已经进入的请求, 将其处理完后, 才会关闭</p></blockquote><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 找到 nginx 进程号</span><br><span class="line">ps -ef | grep nginx</span><br><span class="line"># 执行命令</span><br><span class="line">kill -QUIT &#39;主pid&#39;</span><br><span class="line"># 其中 pid 是主进程号的 pid (master process)</span><br><span class="line"># 其他为子进程 pid (worker process)</span><br></pre></td></tr></table></figure><h4 id="2-快速关闭"><a href="#2-快速关闭" class="headerlink" title="2. 快速关闭"></a>2. 快速关闭</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># 找到 nginx 进程号</span><br><span class="line">ps -ef | grep nginx</span><br><span class="line"># 执行命令</span><br><span class="line">kill -TERM &#39;主pid&#39;</span><br></pre></td></tr></table></figure><h4 id="3-重启-Nginx"><a href="#3-重启-Nginx" class="headerlink" title="3. 重启 Nginx"></a>3. 重启 Nginx</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.&#x2F;nginx -s reload</span><br></pre></td></tr></table></figure><h3 id="配置检查"><a href="#配置检查" class="headerlink" title="配置检查"></a>配置检查</h3><blockquote><p>当修改 Nginx 配置文件后, 可以使用 Nginx 命令进行配置文件语法检查, 用于检查 Nginx 配置文件是否正确</p></blockquote><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># ... ... nginx配置文件地址</span><br><span class="line">.&#x2F;nginx -c &#x2F;... ...&#x2F;nginx.conf -t</span><br></pre></td></tr></table></figure><h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 查看 Nginx 版本</span><br><span class="line">.&#x2F;nginx -v</span><br><span class="line">.&#x2F;nginx -V</span><br><span class="line"># 小v 显示 Nginx 版本</span><br><span class="line"># 大V 显示 Nginx 版本, 编译器版本和配置参数</span><br></pre></td></tr></table></figure><h3 id="Windows环境搭建"><a href="#Windows环境搭建" class="headerlink" title="Windows环境搭建"></a>Windows环境搭建</h3><blockquote><p>在官网下载 windows 版的 Nginx, 将下载包解压即可使用</p></blockquote><p><a href="https://www.nginx.org/en/download.html" target="_blank" rel="noopener">Windows Nginx 地址</a></p><h4 id="启动方式"><a href="#启动方式" class="headerlink" title="启动方式"></a>启动方式</h4><ol><li>双击目录下的 nginx</li><li>dos 窗口, nginx 主目录下, 命令 start nginx<h4 id="关闭方式"><a href="#关闭方式" class="headerlink" title="关闭方式"></a>关闭方式</h4></li><li>资源管理器 ( 两个进程 )</li><li>dos 窗口, nginx 主目录下, 命令 nginx -s stop</li></ol>]]></content>
     
@@ -144,9 +166,7 @@
       <category term="Nginx" scheme="http://www.some-note.cn/category/Nginx/"/>
     
     
-      <category term="Nginx" scheme="http://www.some-note.cn/tag/Nginx/"/>
-    
-      <category term="Nginx环境搭建" scheme="http://www.some-note.cn/tag/Nginx%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/"/>
+      <category term="环境搭建" scheme="http://www.some-note.cn/tag/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/"/>
     
   </entry>
   
@@ -155,7 +175,7 @@
     <link href="http://www.some-note.cn/2020/06/16/Nginx%E5%BC%80%E7%AF%87%E7%AE%80%E4%BB%8B/"/>
     <id>http://www.some-note.cn/2020/06/16/Nginx%E5%BC%80%E7%AF%87%E7%AE%80%E4%BB%8B/</id>
     <published>2020-06-16T02:22:55.000Z</published>
-    <updated>2020-06-16T07:46:10.296Z</updated>
+    <updated>2020-06-29T07:43:39.492Z</updated>
     
     <content type="html"><![CDATA[<blockquote><p>Web服务器 - 反向代理服务器</p></blockquote><ul><li>简介</li><li>环境搭建</li><li>配置文件</li><li>主要应用</li><li>静态网站</li><li>负载均衡</li><li>静态代理</li><li>动静分离</li><li>虚拟主机</li></ul><hr><h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><ol><li>高性能的Web服务器和反向代理服务器, 也可作为邮件代理服务器</li><li>俄罗斯人 Igor Sysoev 采用C语言开发编写, First - 2004/10/04</li><li>特点: 占有内存少 / 并发处理能力强 / 高性能 / 低系统资源消耗 / 官方测试 - 5万并发请求</li><li>同类型的Web服务器: Apache / Lighttpd / Tengine等</li><li>并发处理能力在同类型Web服务器中为最佳选择</li><li>免费开源 / 同时其商业版本提供性能优化, 宕机等紧急问题处理等技术支持和服务</li></ol><h2 id="Nginx反向代理-Reverse-Proxy"><a href="#Nginx反向代理-Reverse-Proxy" class="headerlink" title="Nginx反向代理 (Reverse Proxy)"></a>Nginx反向代理 (Reverse Proxy)</h2><blockquote><p>以反向代理服务器来接收 Internet 上的链接请求, 然后将请求转发给内部网络上的服务器, 并将从服务器上得到的结果返回给 Internet 上请求链接的客户端, 此时代理服务器对外表现为一个<strong><em>反向代理服务器</em></strong><br><img src="/images/Nginx%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86.png" alt="alt"></p></blockquote><h2 id="正向代理"><a href="#正向代理" class="headerlink" title="正向代理"></a>正向代理</h2><blockquote><p>类似一个跳板机, ‘代理访问外部资源’, 通过访问代理服务器, 获取无法访问网站的内容</p></blockquote><h2 id="正反区别"><a href="#正反区别" class="headerlink" title="正反区别"></a>正反区别</h2><blockquote><p>是否知道其底层服务器的 <strong><em>ip</em></strong> , <strong><em>port</em></strong> 等</p></blockquote>]]></content>
     
@@ -182,7 +202,7 @@
       <category term="Nginx" scheme="http://www.some-note.cn/category/Nginx/"/>
     
     
-      <category term="Nginx" scheme="http://www.some-note.cn/tag/Nginx/"/>
+      <category term="简介" scheme="http://www.some-note.cn/tag/%E7%AE%80%E4%BB%8B/"/>
     
   </entry>
   
