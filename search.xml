@@ -1,6 +1,209 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Nginx主要应用 - 动静分离</title>
+    <url>/2020/07/16/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E5%8A%A8%E9%9D%99%E5%88%86%E7%A6%BB/</url>
+    <content><![CDATA[<blockquote>
+<ul>
+<li>Nginx 的 <strong>负载均衡</strong> 和 <strong>静态代理</strong> 结合在一起, 可以实现 <strong>动静分离</strong>, 这是实际应用中常见的一种场景</li>
+<li>动态资源, 如 jsp 由 Tomcat 或其他 Web 服务器完成</li>
+<li>静态资源, 如 img / css / js 等由 Nginx 服务器完成</li>
+<li>充分利用其各自优势, 从而达到更高效合理的架构</li>
+</ul>
+</blockquote>
+<h2 id="动静分离示例图"><a href="#动静分离示例图" class="headerlink" title="动静分离示例图"></a>动静分离示例图</h2><p><img src="/images/Nginx%E5%8A%A8%E9%9D%99%E5%88%86%E7%A6%BB%E7%AE%80%E6%98%93%E5%9B%BE.png" alt=""></p>
+<blockquote>
+<ul>
+<li>Nginx 在一台 Linux 上安装一份, 可以启动多 , 每个 Nginx 的配置文件不一样即可</li>
+</ul>
+</blockquote>
+]]></content>
+      <categories>
+        <category>Nginx</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>Nginx主要应用 - 虚拟主机</title>
+    <url>/2020/07/16/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E8%99%9A%E6%8B%9F%E4%B8%BB%E6%9C%BA/</url>
+    <content><![CDATA[<blockquote>
+<ul>
+<li>虚拟主机，就是把一台物理服务器划分成多个‘虚拟’的服务器，这样一台物理服务器就可以当作多个服务器来使用，从而可以配置多个网站</li>
+<li>Nginx 提供虚拟主机的功能，就是为了让我们无需安装多个 Nginx, 就可以运行多个网站</li>
+<li>Nginx 下，一个 server 标签就是一个虚拟主机</li>
+<li>Nginx 的虚拟主机就是通过 nginx.conf 中 server 节点指定的，要想设置多个虚拟主机，配置多个 server 节点即可</li>
+</ul>
+</blockquote>
+<h2 id="配置虚拟主机，通常有一下两种方式"><a href="#配置虚拟主机，通常有一下两种方式" class="headerlink" title="配置虚拟主机，通常有一下两种方式"></a>配置虚拟主机，通常有一下两种方式</h2><h3 id="1-基于端口的虚拟主机"><a href="#1-基于端口的虚拟主机" class="headerlink" title="1. 基于端口的虚拟主机"></a>1. 基于端口的虚拟主机</h3><ul>
+<li>使用端口号来做区分，server 节点中的 listen</li>
+</ul>
+<h3 id="2-基于域名的虚拟主机"><a href="#2-基于域名的虚拟主机" class="headerlink" title="2. 基于域名的虚拟主机"></a>2. 基于域名的虚拟主机</h3><ul>
+<li>使用域名来做区分， server 节点中的 server_name</li>
+</ul>
+<hr>
+<blockquote>
+<p>自定义域名，使用时，需修改 <strong>hosts文件配置</strong></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 例如</span><br><span class="line">192.168.208.128 www.sean.com</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>文件位置 ： C:\windows\System32\driver\etc\hosts</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>Nginx</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>Nginx主要应用 - 静态代理</title>
+    <url>/2020/06/30/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E9%9D%99%E6%80%81%E4%BB%A3%E7%90%86/</url>
+    <content><![CDATA[<ul>
+<li><p>把所有 <strong>静态资源</strong> 的访问改为访问 Nginx, 而不是访问 Tomcat, 因为 Nginx 更擅长于静态资源的处理, 性能更好, 效率更高</p>
+</li>
+<li><p>实际应用中, 我们应该将 <strong>静态资源</strong> 比如 : image / css / html / js 等交给 Nginx 做处理, 而不是由 Tomcat 处理</p>
+</li>
+</ul>
+<h2 id="Nginx静态代理实现的两种方式"><a href="#Nginx静态代理实现的两种方式" class="headerlink" title="Nginx静态代理实现的两种方式"></a>Nginx静态代理实现的两种方式</h2><h3 id="方式一"><a href="#方式一" class="headerlink" title="方式一"></a>方式一</h3><blockquote>
+<p><strong>通过在 Nginx 的 nginx.conf 配置文件中添加静态资源的 location</strong></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 例如 : ( 表示 () 中这些后缀结尾的文件都由 Nginx 处理 )</span><br><span class="line">location ~.*\.(js|css|html|git|jpg|jpeg|png|doc|ppt|mp3)$ &#123;</span><br><span class="line">    root &#x2F;opt&#x2F;static;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<ul>
+<li><strong>~</strong> 表示正则匹配, 也就是说后面的内容可以是正则表达式匹配</li>
+<li><strong>.</strong> 第一个点, 表示任意字符</li>
+<li><strong>*</strong> 表示一个或多个字符</li>
+<li><strong>\.</strong> 是转义字符, 是后面这个点的转义字符</li>
+<li><strong>|</strong> 表示或者</li>
+<li><strong>$</strong> 表示结尾</li>
+</ul>
+</blockquote>
+<h3 id="方式二"><a href="#方式二" class="headerlink" title="方式二"></a>方式二</h3><blockquote>
+<p>通过在 nginx.conf 配置文件中配置 <strong>静态资源所在目录</strong> 实现</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">location ~.*&#x2F;(css|js|img|images) &#123;</span><br><span class="line">    root &#x2F;opt&#x2F;static;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<ul>
+<li>将静态资源放入 /opt/static 目录下, 拦截请求地址中的 ‘String’, 然后用户访问时由 Nginx 返回这些静态资源</li>
+</ul>
+</blockquote>
+]]></content>
+      <categories>
+        <category>Nginx</category>
+      </categories>
+      <tags>
+        <tag>静态代理</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Nginx主要应用 - 负载均衡</title>
+    <url>/2020/06/29/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/</url>
+    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><ul>
+<li>将用户输入的 http 网址请求分发到集群中不同的机器上, 这就是负载均衡要做的事情</li>
+<li>负载均衡通常是指将请求 ‘均匀’ 分推到集群中多个服务器节点上进行执行, 这里的均匀是指在一个比较大的统计范围内是基本均匀的, 并不是完全均匀</li>
+</ul>
+<h2 id="实现方式"><a href="#实现方式" class="headerlink" title="实现方式"></a>实现方式</h2><h3 id="硬件负载均衡"><a href="#硬件负载均衡" class="headerlink" title="硬件负载均衡"></a>硬件负载均衡</h3><ul>
+<li>比如 : F5 / 深信服 / Array等</li>
+<li>优点 : 有厂商专业的技术服务团队提供支持, 性能稳定</li>
+<li>缺点 : 费用昂贵, 对于规模较小的网络应用成本太高</li>
+</ul>
+<h3 id="软件负载均衡"><a href="#软件负载均衡" class="headerlink" title="软件负载均衡"></a>软件负载均衡</h3><ul>
+<li>比如 : Nginx / LVS / HAProxy等</li>
+<li>优点 : 免费开源, 成本低廉</li>
+</ul>
+<h2 id="Nginx负载均衡"><a href="#Nginx负载均衡" class="headerlink" title="Nginx负载均衡"></a>Nginx负载均衡</h2><h3 id="如何实现"><a href="#如何实现" class="headerlink" title="如何实现"></a>如何实现</h3><blockquote>
+<p>通过在 Nginx 的 nginx.conf 文件进行 <strong>配置</strong> 即可实现</p>
+</blockquote>
+<ul>
+<li>下为Nginx负载简易图<br><img src="/images/Nginx%E8%B4%9F%E8%BD%BD%E7%AE%80%E6%98%93%E5%9B%BE.png" alt=""></li>
+</ul>
+<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><h4 id="1-在-http-模块添加-例"><a href="#1-在-http-模块添加-例" class="headerlink" title="1. 在 http 模块添加 ( 例 )"></a>1. 在 http 模块添加 ( 例 )</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># upstream 的名字, 一般定为域名</span><br><span class="line">upstream www.sean.com &#123; </span><br><span class="line">#对应 Tomcat 的 IP &amp; Port</span><br><span class="line">    server 127.0.0.1:9100 weight&#x3D;3; </span><br><span class="line">#有几个 Tomcat, 就配几个 server</span><br><span class="line">    server 127.0.0.1:9200 weight&#x3D;1; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<ul>
+<li>其中 <strong>weight</strong> 表示权重, 用于后端服务器性能不均的情况, 访问比率约等于权重之比, 权重越大访问机会越多</li>
+<li><strong>upstream</strong> 是配置 <strong>Nginx</strong> 与后端服务器负载均衡非常重要的一个模块. 并且它还能对后端服务器的健康状况进行检查, 若后端服务器中的一台发生故障, 则前端的请求不会转发到该故障的机器</li>
+</ul>
+</blockquote>
+<h4 id="2-在server模块里添加-例"><a href="#2-在server模块里添加-例" class="headerlink" title="2. 在server模块里添加 ( 例 )"></a>2. 在server模块里添加 ( 例 )</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># www.sean.com字符串要与upstream后面的字符串相等</span><br><span class="line">location &#x2F;sean &#123; # 项目路径</span><br><span class="line">    proxy_pass http:&#x2F;&#x2F;www.sean.com; # 代理转发</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="Nginx常用负载均衡策略"><a href="#Nginx常用负载均衡策略" class="headerlink" title="Nginx常用负载均衡策略"></a>Nginx常用负载均衡策略</h2><blockquote>
+<p><strong>轮询(默认)</strong> / <strong>权重</strong> / <strong>ip_hash</strong> / <strong>最少链接</strong></p>
+</blockquote>
+<h3 id="1-轮询"><a href="#1-轮询" class="headerlink" title="1. 轮询"></a>1. 轮询</h3><blockquote>
+<p>每个请求轮流分配到不同的后端服务器, 如果后端服务器down掉, 将自动剔除</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 无 weight</span><br><span class="line">upstream sean &#123;</span><br><span class="line">    server 127.0.0.1:8080;</span><br><span class="line">    server 127.0.0.1:9090;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-权重"><a href="#2-权重" class="headerlink" title="2. 权重"></a>2. 权重</h3><blockquote>
+<p>每个请求按一定比例分发到不同的服务器, <strong>weight</strong> 值越大 访问的比例越大, 用于后端服务器性能不均的情况</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 有 weight</span><br><span class="line">upstream sean &#123;</span><br><span class="line">    server 192.168.0.14 weight&#x3D;5;</span><br><span class="line">    server 192.168.0.15 weight&#x3D;2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-ip-hash"><a href="#3-ip-hash" class="headerlink" title="3. ip_hash"></a>3. ip_hash</h3><blockquote>
+<p>也叫 IP 绑定, 每个请求按访问 <strong>IP的hash值</strong> 分配, 这样每个访问 客户端都会固定访问一个后端服务器, 可以解决 <strong>会话session</strong> 丢失的问题</p>
+</blockquote>
+<ul>
+<li>使用源地址哈希算法, 将同一客户端的请求总是发往同一后端服务器, 除非该服务器不可用</li>
+<li>类似 : hash(“124.207.55.82”) % 2 = ?  (0 | 1)</li>
+</ul>
+<h4 id="存在问题"><a href="#存在问题" class="headerlink" title="存在问题"></a>存在问题</h4><blockquote>
+<ul>
+<li>当后端服务器宕机, session会丢失; </li>
+<li>来自同一局域网的客户端会被转发到同一后端服务器, 可能导致负载失衡; </li>
+<li>不适用于 CDN 网络</li>
+</ul>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">upstream sean &#123;</span><br><span class="line">    ip_hash;</span><br><span class="line">    server 127.0.0.1:8080;</span><br><span class="line">    server 127.0.0.1:9090;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-最少链接"><a href="#4-最少链接" class="headerlink" title="4. 最少链接"></a>4. 最少链接</h3><blockquote>
+<p>Web请求会被转发到连接数最少的服务器上</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">upstream sean &#123;</span><br><span class="line">    least_conn;</span><br><span class="line">    server 127.0.0.1:8080;</span><br><span class="line">    server 127.0.0.1:9090;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="负载均衡其他几个配置"><a href="#负载均衡其他几个配置" class="headerlink" title="负载均衡其他几个配置"></a>负载均衡其他几个配置</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 其他所有非 backup 机器 down 机的时候, 才会请求 backup 机器, 俗称 &#39;备胎&#39;</span><br><span class="line"># backup 可用在上线期间更新产品 , reload</span><br><span class="line">upstream sean &#123;</span><br><span class="line">    server 127.0.0.1:9100;</span><br><span class="line">    server 127.0.0.1:9200 backup;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># down 表示当前的 server 是 down 状态, 不参与负载均衡</span><br><span class="line">upstream sean &#123;</span><br><span class="line">    server 127.0.0.1:9100;</span><br><span class="line">    server 127.0.0.1:9200 down;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>Nginx</category>
+      </categories>
+      <tags>
+        <tag>负载均衡</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Nginx主要应用 - 静态网站</title>
+    <url>/2020/06/22/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E9%9D%99%E6%80%81%E7%BD%91%E7%AB%99/</url>
+    <content><![CDATA[<blockquote>
+<p>Nginx 是一个 HTTP 的 Web 服务器, 可以将服务器上的静态文件 (如html / img等) 通过 HTTP 协议返回给浏览器客户端</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># IP + Port &#x3D; root</span><br><span class="line">server &#123;</span><br><span class="line">    listen 80; # 端口号</span><br><span class="line">    location &#x2F; &#123;</span><br><span class="line">        root &#x2F;opt&#x2F;www&#x2F;; # 静态文件路径</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>Nginx</category>
+      </categories>
+      <tags>
+        <tag>静态网站</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Ngxin配置文件</title>
+    <url>/2020/06/18/Ngxin%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/</url>
+    <content><![CDATA[<blockquote>
+<p>学习 <strong>Nginx</strong>, 首先需要对它的核心配置文件 nginx.conf 有一定认识</p>
+</blockquote>
+<blockquote>
+<p>Nginx 的核心配置文件主要由三个部分构成</p>
+</blockquote>
+<p><strong><em>基本配置</em></strong> / <strong><em>events配置</em></strong> / <strong><em>http配置( 基本配置 / 多个server配置 )</em></strong></p>
+<ul>
+<li>看下图</li>
+</ul>
+<p>  <img src="/images/nginx%E9%85%8D%E7%BD%AE%E4%B8%AD%E6%96%87%E8%AF%A6%E8%A7%A3.png" alt=""></p>
+]]></content>
+      <categories>
+        <category>Nginx</category>
+      </categories>
+      <tags>
+        <tag>配置</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Nginx主要应用</title>
     <url>/2020/06/19/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8/</url>
     <content><![CDATA[<blockquote>
@@ -17,6 +220,24 @@
       <categories>
         <category>Nginx</category>
       </categories>
+  </entry>
+  <entry>
+    <title>Hello World</title>
+    <url>/2020/06/15/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+
+<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+]]></content>
   </entry>
   <entry>
     <title>Nginx环境搭建</title>
@@ -106,46 +327,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Ngxin配置文件</title>
-    <url>/2020/06/18/Ngxin%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/</url>
-    <content><![CDATA[<blockquote>
-<p>学习 <strong>Nginx</strong>, 首先需要对它的核心配置文件 nginx.conf 有一定认识</p>
-</blockquote>
-<blockquote>
-<p>Nginx 的核心配置文件主要由三个部分构成</p>
-</blockquote>
-<p><strong><em>基本配置</em></strong> / <strong><em>events配置</em></strong> / <strong><em>http配置( 基本配置 / 多个server配置 )</em></strong></p>
-<ul>
-<li>看下图</li>
-</ul>
-<p>  <img src="/images/nginx%E9%85%8D%E7%BD%AE%E4%B8%AD%E6%96%87%E8%AF%A6%E8%A7%A3.png" alt=""></p>
-]]></content>
-      <categories>
-        <category>Nginx</category>
-      </categories>
-      <tags>
-        <tag>配置</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Hello World</title>
-    <url>/2020/06/15/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p>
-]]></content>
-  </entry>
-  <entry>
     <title>Nginx开篇简介</title>
     <url>/2020/06/16/Nginx%E5%BC%80%E7%AF%87%E7%AE%80%E4%BB%8B/</url>
     <content><![CDATA[<blockquote>
@@ -186,134 +367,6 @@
       </categories>
       <tags>
         <tag>简介</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Nginx主要应用 - 静态网站</title>
-    <url>/2020/06/22/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E9%9D%99%E6%80%81%E7%BD%91%E7%AB%99/</url>
-    <content><![CDATA[<blockquote>
-<p>Nginx 是一个 HTTP 的 Web 服务器, 可以将服务器上的静态文件 (如html / img等) 通过 HTTP 协议返回给浏览器客户端</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># IP + Port &#x3D; root</span><br><span class="line">server &#123;</span><br><span class="line">    listen 80; # 端口号</span><br><span class="line">    location &#x2F; &#123;</span><br><span class="line">        root &#x2F;opt&#x2F;www&#x2F;; # 静态文件路径</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
-      <categories>
-        <category>Nginx</category>
-      </categories>
-      <tags>
-        <tag>静态网站</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Nginx主要应用 - 负载均衡</title>
-    <url>/2020/06/29/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/</url>
-    <content><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><ul>
-<li>将用户输入的 http 网址请求分发到集群中不同的机器上, 这就是负载均衡要做的事情</li>
-<li>负载均衡通常是指将请求 ‘均匀’ 分推到集群中多个服务器节点上进行执行, 这里的均匀是指在一个比较大的统计范围内是基本均匀的, 并不是完全均匀</li>
-</ul>
-<h2 id="实现方式"><a href="#实现方式" class="headerlink" title="实现方式"></a>实现方式</h2><h3 id="硬件负载均衡"><a href="#硬件负载均衡" class="headerlink" title="硬件负载均衡"></a>硬件负载均衡</h3><ul>
-<li>比如 : F5 / 深信服 / Array等</li>
-<li>优点 : 有厂商专业的技术服务团队提供支持, 性能稳定</li>
-<li>缺点 : 费用昂贵, 对于规模较小的网络应用成本太高</li>
-</ul>
-<h3 id="软件负载均衡"><a href="#软件负载均衡" class="headerlink" title="软件负载均衡"></a>软件负载均衡</h3><ul>
-<li>比如 : Nginx / LVS / HAProxy等</li>
-<li>优点 : 免费开源, 成本低廉</li>
-</ul>
-<h2 id="Nginx负载均衡"><a href="#Nginx负载均衡" class="headerlink" title="Nginx负载均衡"></a>Nginx负载均衡</h2><h3 id="如何实现"><a href="#如何实现" class="headerlink" title="如何实现"></a>如何实现</h3><blockquote>
-<p>通过在 Nginx 的 nginx.conf 文件进行 <strong>配置</strong> 即可实现</p>
-</blockquote>
-<ul>
-<li>下为Nginx负载简易图<br><img src="/images/Nginx%E8%B4%9F%E8%BD%BD%E7%AE%80%E6%98%93%E5%9B%BE.png" alt=""></li>
-</ul>
-<h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><h4 id="1-在-http-模块添加-例"><a href="#1-在-http-模块添加-例" class="headerlink" title="1. 在 http 模块添加 ( 例 )"></a>1. 在 http 模块添加 ( 例 )</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># upstream 的名字, 一般定为域名</span><br><span class="line">upstream www.sean.com &#123; </span><br><span class="line">#对应 Tomcat 的 IP &amp; Port</span><br><span class="line">    server 127.0.0.1:9100 weight&#x3D;3; </span><br><span class="line">#有几个 Tomcat, 就配几个 server</span><br><span class="line">    server 127.0.0.1:9200 weight&#x3D;1; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<ul>
-<li>其中 <strong>weight</strong> 表示权重, 用于后端服务器性能不均的情况, 访问比率约等于权重之比, 权重越大访问机会越多</li>
-<li><strong>upstream</strong> 是配置 <strong>Nginx</strong> 与后端服务器负载均衡非常重要的一个模块. 并且它还能对后端服务器的健康状况进行检查, 若后端服务器中的一台发生故障, 则前端的请求不会转发到该故障的机器</li>
-</ul>
-</blockquote>
-<h4 id="2-在server模块里添加-例"><a href="#2-在server模块里添加-例" class="headerlink" title="2. 在server模块里添加 ( 例 )"></a>2. 在server模块里添加 ( 例 )</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># www.sean.com字符串要与upstream后面的字符串相等</span><br><span class="line">location &#x2F;sean &#123; # 项目路径</span><br><span class="line">    proxy_pass http:&#x2F;&#x2F;www.sean.com; # 代理转发</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="Nginx常用负载均衡策略"><a href="#Nginx常用负载均衡策略" class="headerlink" title="Nginx常用负载均衡策略"></a>Nginx常用负载均衡策略</h2><blockquote>
-<p><strong>轮询(默认)</strong> / <strong>权重</strong> / <strong>ip_hash</strong> / <strong>最少链接</strong></p>
-</blockquote>
-<h3 id="1-轮询"><a href="#1-轮询" class="headerlink" title="1. 轮询"></a>1. 轮询</h3><blockquote>
-<p>每个请求轮流分配到不同的后端服务器, 如果后端服务器down掉, 将自动剔除</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 无 weight</span><br><span class="line">upstream sean &#123;</span><br><span class="line">    server 127.0.0.1:8080;</span><br><span class="line">    server 127.0.0.1:9090;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="2-权重"><a href="#2-权重" class="headerlink" title="2. 权重"></a>2. 权重</h3><blockquote>
-<p>每个请求按一定比例分发到不同的服务器, <strong>weight</strong> 值越大 访问的比例越大, 用于后端服务器性能不均的情况</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 有 weight</span><br><span class="line">upstream sean &#123;</span><br><span class="line">    server 192.168.0.14 weight&#x3D;5;</span><br><span class="line">    server 192.168.0.15 weight&#x3D;2;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="3-ip-hash"><a href="#3-ip-hash" class="headerlink" title="3. ip_hash"></a>3. ip_hash</h3><blockquote>
-<p>也叫 IP 绑定, 每个请求按访问 <strong>IP的hash值</strong> 分配, 这样每个访问 客户端都会固定访问一个后端服务器, 可以解决 <strong>会话session</strong> 丢失的问题</p>
-</blockquote>
-<ul>
-<li>使用源地址哈希算法, 将同一客户端的请求总是发往同一后端服务器, 除非该服务器不可用</li>
-<li>类似 : hash(“124.207.55.82”) % 2 = ?  (0 | 1)</li>
-</ul>
-<h4 id="存在问题"><a href="#存在问题" class="headerlink" title="存在问题"></a>存在问题</h4><blockquote>
-<ul>
-<li>当后端服务器宕机, session会丢失; </li>
-<li>来自同一局域网的客户端会被转发到同一后端服务器, 可能导致负载失衡; </li>
-<li>不适用于 CDN 网络</li>
-</ul>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">upstream sean &#123;</span><br><span class="line">    ip_hash;</span><br><span class="line">    server 127.0.0.1:8080;</span><br><span class="line">    server 127.0.0.1:9090;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="4-最少链接"><a href="#4-最少链接" class="headerlink" title="4. 最少链接"></a>4. 最少链接</h3><blockquote>
-<p>Web请求会被转发到连接数最少的服务器上</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">upstream sean &#123;</span><br><span class="line">    least_conn;</span><br><span class="line">    server 127.0.0.1:8080;</span><br><span class="line">    server 127.0.0.1:9090;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h2 id="负载均衡其他几个配置"><a href="#负载均衡其他几个配置" class="headerlink" title="负载均衡其他几个配置"></a>负载均衡其他几个配置</h2><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 其他所有非 backup 机器 down 机的时候, 才会请求 backup 机器, 俗称 &#39;备胎&#39;</span><br><span class="line"># backup 可用在上线期间更新产品 , reload</span><br><span class="line">upstream sean &#123;</span><br><span class="line">    server 127.0.0.1:9100;</span><br><span class="line">    server 127.0.0.1:9200 backup;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># down 表示当前的 server 是 down 状态, 不参与负载均衡</span><br><span class="line">upstream sean &#123;</span><br><span class="line">    server 127.0.0.1:9100;</span><br><span class="line">    server 127.0.0.1:9200 down;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
-      <categories>
-        <category>Nginx</category>
-      </categories>
-      <tags>
-        <tag>负载均衡</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Nginx主要应用 - 静态代理</title>
-    <url>/2020/06/30/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E9%9D%99%E6%80%81%E4%BB%A3%E7%90%86/</url>
-    <content><![CDATA[<ul>
-<li><p>把所有 <strong>静态资源</strong> 的访问改为访问 Nginx, 而不是访问 Tomcat, 因为 Nginx 更擅长于静态资源的处理, 性能更好, 效率更高</p>
-</li>
-<li><p>实际应用中, 我们应该将 <strong>静态资源</strong> 比如 : image / css / html / js 等交给 Nginx 做处理, 而不是由 Tomcat 处理</p>
-</li>
-</ul>
-<h2 id="Nginx静态代理实现的两种方式"><a href="#Nginx静态代理实现的两种方式" class="headerlink" title="Nginx静态代理实现的两种方式"></a>Nginx静态代理实现的两种方式</h2><h3 id="方式一"><a href="#方式一" class="headerlink" title="方式一"></a>方式一</h3><blockquote>
-<p><strong>通过在 Nginx 的 nginx.conf 配置文件中添加静态资源的 location</strong></p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 例如 : ( 表示 () 中这些后缀结尾的文件都由 Nginx 处理 )</span><br><span class="line">location ~.*\.(js|css|html|git|jpg|jpeg|png|doc|ppt|mp3)$ &#123;</span><br><span class="line">    root &#x2F;opt&#x2F;static;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<ul>
-<li><strong>~</strong> 表示正则匹配, 也就是说后面的内容可以是正则表达式匹配</li>
-<li><strong>.</strong> 第一个点, 表示任意字符</li>
-<li><strong>*</strong> 表示一个或多个字符</li>
-<li><strong>\.</strong> 是转义字符, 是后面这个点的转义字符</li>
-<li><strong>|</strong> 表示或者</li>
-<li><strong>$</strong> 表示结尾</li>
-</ul>
-</blockquote>
-<h3 id="方式二"><a href="#方式二" class="headerlink" title="方式二"></a>方式二</h3><blockquote>
-<p>通过在 nginx.conf 配置文件中配置 <strong>静态资源所在目录</strong> 实现</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">location ~.*&#x2F;(css|js|img|images) &#123;</span><br><span class="line">    root &#x2F;opt&#x2F;static;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<ul>
-<li>将静态资源放入 /opt/static 目录下, 拦截请求地址中的 ‘String’, 然后用户访问时由 Nginx 返回这些静态资源</li>
-</ul>
-</blockquote>
-]]></content>
-      <categories>
-        <category>Nginx</category>
-      </categories>
-      <tags>
-        <tag>静态代理</tag>
       </tags>
   </entry>
 </search>

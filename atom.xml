@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.some-note.cn/"/>
-  <updated>2020-06-30T09:34:24.821Z</updated>
+  <updated>2020-07-16T02:16:01.522Z</updated>
   <id>http://www.some-note.cn/</id>
   
   <author>
@@ -15,6 +15,60 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Nginx主要应用 - 虚拟主机</title>
+    <link href="http://www.some-note.cn/2020/07/16/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E8%99%9A%E6%8B%9F%E4%B8%BB%E6%9C%BA/"/>
+    <id>http://www.some-note.cn/2020/07/16/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E8%99%9A%E6%8B%9F%E4%B8%BB%E6%9C%BA/</id>
+    <published>2020-07-16T02:15:23.000Z</published>
+    <updated>2020-07-16T02:16:01.522Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote><ul><li>虚拟主机，就是把一台物理服务器划分成多个‘虚拟’的服务器，这样一台物理服务器就可以当作多个服务器来使用，从而可以配置多个网站</li><li>Nginx 提供虚拟主机的功能，就是为了让我们无需安装多个 Nginx, 就可以运行多个网站</li><li>Nginx 下，一个 server 标签就是一个虚拟主机</li><li>Nginx 的虚拟主机就是通过 nginx.conf 中 server 节点指定的，要想设置多个虚拟主机，配置多个 server 节点即可</li></ul></blockquote><h2 id="配置虚拟主机，通常有一下两种方式"><a href="#配置虚拟主机，通常有一下两种方式" class="headerlink" title="配置虚拟主机，通常有一下两种方式"></a>配置虚拟主机，通常有一下两种方式</h2><h3 id="1-基于端口的虚拟主机"><a href="#1-基于端口的虚拟主机" class="headerlink" title="1. 基于端口的虚拟主机"></a>1. 基于端口的虚拟主机</h3><ul><li>使用端口号来做区分，server 节点中的 listen</li></ul><h3 id="2-基于域名的虚拟主机"><a href="#2-基于域名的虚拟主机" class="headerlink" title="2. 基于域名的虚拟主机"></a>2. 基于域名的虚拟主机</h3><ul><li>使用域名来做区分， server 节点中的 server_name</li></ul><hr><blockquote><p>自定义域名，使用时，需修改 <strong>hosts文件配置</strong></p></blockquote><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># 例如</span><br><span class="line">192.168.208.128 www.sean.com</span><br></pre></td></tr></table></figure><blockquote><p>文件位置 ： C:\windows\System32\driver\etc\hosts</p></blockquote>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;虚拟主机，就是把一台物理服务器划分成多个‘虚拟’的服务器，这样一台物理服务器就可以当作多个服务器来使用，从而可以配置多个网站&lt;/li&gt;
+&lt;li&gt;Nginx 提供虚拟主机的功能，就是为了让我们无需安装多个 Nginx, 就可以运行多个网站
+      
+    
+    </summary>
+    
+    
+      <category term="Nginx" scheme="http://www.some-note.cn/category/Nginx/"/>
+    
+    
+  </entry>
+  
+  <entry>
+    <title>Nginx主要应用 - 动静分离</title>
+    <link href="http://www.some-note.cn/2020/07/16/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E5%8A%A8%E9%9D%99%E5%88%86%E7%A6%BB/"/>
+    <id>http://www.some-note.cn/2020/07/16/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E5%8A%A8%E9%9D%99%E5%88%86%E7%A6%BB/</id>
+    <published>2020-07-16T02:11:40.000Z</published>
+    <updated>2020-07-16T02:14:20.251Z</updated>
+    
+    <content type="html"><![CDATA[<blockquote><ul><li>Nginx 的 <strong>负载均衡</strong> 和 <strong>静态代理</strong> 结合在一起, 可以实现 <strong>动静分离</strong>, 这是实际应用中常见的一种场景</li><li>动态资源, 如 jsp 由 Tomcat 或其他 Web 服务器完成</li><li>静态资源, 如 img / css / js 等由 Nginx 服务器完成</li><li>充分利用其各自优势, 从而达到更高效合理的架构</li></ul></blockquote><h2 id="动静分离示例图"><a href="#动静分离示例图" class="headerlink" title="动静分离示例图"></a>动静分离示例图</h2><p><img src="/images/Nginx%E5%8A%A8%E9%9D%99%E5%88%86%E7%A6%BB%E7%AE%80%E6%98%93%E5%9B%BE.png" alt=""></p><blockquote><ul><li>Nginx 在一台 Linux 上安装一份, 可以启动多 , 每个 Nginx 的配置文件不一样即可</li></ul></blockquote>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;Nginx 的 &lt;strong&gt;负载均衡&lt;/strong&gt; 和 &lt;strong&gt;静态代理&lt;/strong&gt; 结合在一起, 可以实现 &lt;strong&gt;动静分离&lt;/strong&gt;, 这是实际应用中常见的一种场景&lt;/li&gt;
+&lt;li&gt;动态资源,
+      
+    
+    </summary>
+    
+    
+      <category term="Nginx" scheme="http://www.some-note.cn/category/Nginx/"/>
+    
+    
+  </entry>
   
   <entry>
     <title>Nginx主要应用 - 静态代理</title>
@@ -141,7 +195,7 @@
     <link href="http://www.some-note.cn/2020/06/18/Ngxin%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/"/>
     <id>http://www.some-note.cn/2020/06/18/Ngxin%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/</id>
     <published>2020-06-18T09:06:31.000Z</published>
-    <updated>2020-06-29T07:43:54.814Z</updated>
+    <updated>2020-06-29T07:45:46.727Z</updated>
     
     <content type="html"><![CDATA[<blockquote><p>学习 <strong>Nginx</strong>, 首先需要对它的核心配置文件 nginx.conf 有一定认识</p></blockquote><blockquote><p>Nginx 的核心配置文件主要由三个部分构成</p></blockquote><p><strong><em>基本配置</em></strong> / <strong><em>events配置</em></strong> / <strong><em>http配置( 基本配置 / 多个server配置 )</em></strong></p><ul><li>看下图</li></ul><p>  <img src="/images/nginx%E9%85%8D%E7%BD%AE%E4%B8%AD%E6%96%87%E8%AF%A6%E8%A7%A3.png" alt=""></p>]]></content>
     
