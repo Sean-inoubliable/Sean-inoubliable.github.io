@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://www.some-note.cn/"/>
-  <updated>2020-08-20T02:19:22.582Z</updated>
+  <updated>2020-08-20T02:23:05.324Z</updated>
   <id>http://www.some-note.cn/</id>
   
   <author>
@@ -15,6 +15,34 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Nginx-配合Redis对所有Tomcat做session共享</title>
+    <link href="http://www.some-note.cn/2020/08/20/Nginx-%E9%85%8D%E5%90%88Redis%E5%AF%B9%E6%89%80%E6%9C%89Tomcat%E5%81%9Asession%E5%85%B1%E4%BA%AB/"/>
+    <id>http://www.some-note.cn/2020/08/20/Nginx-%E9%85%8D%E5%90%88Redis%E5%AF%B9%E6%89%80%E6%9C%89Tomcat%E5%81%9Asession%E5%85%B1%E4%BA%AB/</id>
+    <published>2020-08-20T02:22:36.000Z</published>
+    <updated>2020-08-20T02:23:05.324Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="关于-Nginx-做集群时-遇到-session-丢失的问题"><a href="#关于-Nginx-做集群时-遇到-session-丢失的问题" class="headerlink" title="关于 Nginx 做集群时 , 遇到 session 丢失的问题"></a>关于 Nginx 做集群时 , 遇到 session 丢失的问题</h1><ul><li>配合 <strong>Redis</strong> 对所有的 <strong>Tomcat</strong> 做 <strong>session 共享</strong></li></ul><hr><blockquote><p>  其实Spring本身就有提供对redis的支持，<br>  就是spring-session，<br>  我们只需将这个在pom.xml添加如下代码，<br>  maven便会自己下载所需的jar包及依赖包。 </p></blockquote><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">      &lt;groupId&gt;org.springframework.session&lt;&#x2F;groupId&gt;</span><br><span class="line">      &lt;artifactId&gt;spring-session-data-redis&lt;&#x2F;artifactId&gt;</span><br><span class="line">      &lt;version&gt;1.1.1.RELEASE&lt;&#x2F;version&gt;</span><br><span class="line">      &lt;type&gt;pom&lt;&#x2F;type&gt;</span><br><span class="line">&lt;&#x2F;dependency&gt;</span><br></pre></td></tr></table></figure><hr><blockquote><p>随后我们在resources文件夹中新建一个redis.properties，往里面添加如下内容。</p></blockquote><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">#主机地址</span><br><span class="line">redis_hostName &#x3D; </span><br><span class="line">#端口</span><br><span class="line">redis_port &#x3D; </span><br><span class="line">#密码</span><br><span class="line">redis_password &#x3D; </span><br><span class="line">#超时时间</span><br><span class="line">redis_timeout &#x3D;</span><br></pre></td></tr></table></figure><hr><blockquote><p>再新建一个spring-redis.xml，往里面添加我们redis相关的配置。其中maxInactiveIntervalInSeconds是设置session有效时间，以秒为单位，但实际上无论怎么设，session真实有效时间还是会比我们设置的稍微长一些</p></blockquote><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;beans xmlns&#x3D;&quot;http:&#x2F;&#x2F;www.springframework.org&#x2F;schema&#x2F;beans&quot;</span><br><span class="line">       xmlns:xsi&#x3D;&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2001&#x2F;XMLSchema-instance&quot;</span><br><span class="line">       xsi:schemaLocation&#x3D;&quot;http:&#x2F;&#x2F;www.springframework.org&#x2F;schema&#x2F;beans</span><br><span class="line">       http:&#x2F;&#x2F;www.springframework.org&#x2F;schema&#x2F;beans&#x2F;spring-beans.xsd&quot;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;!-- session设置 --&gt;</span><br><span class="line">    &lt;bean class&#x3D;&quot;org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration&quot;&gt;</span><br><span class="line">        &lt;property name&#x3D;&quot;maxInactiveIntervalInSeconds&quot; value&#x3D;&quot;3600&quot;&gt;&lt;&#x2F;property&gt;</span><br><span class="line">    &lt;&#x2F;bean&gt;</span><br><span class="line">    &lt;!-- redis连接池 --&gt;</span><br><span class="line">    &lt;bean id&#x3D;&quot;poolConfig&quot; class&#x3D;&quot;redis.clients.jedis.JedisPoolConfig&quot;&#x2F;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;!-- redis连接工厂 --&gt;</span><br><span class="line">    &lt;bean id&#x3D;&quot;connectionFactory&quot; class&#x3D;&quot;org.springframework.data.redis.connection.jedis.JedisConnectionFactory&quot;&gt;</span><br><span class="line">        &lt;property name&#x3D;&quot;hostName&quot; value&#x3D;&quot;$&#123;redis_hostName&#125;&quot;&#x2F;&gt;</span><br><span class="line">        &lt;property name&#x3D;&quot;port&quot; value&#x3D;&quot;$&#123;redis_port&#125;&quot;&#x2F;&gt;</span><br><span class="line">        &lt;property name&#x3D;&quot;password&quot; value&#x3D;&quot;$&#123;redis_password&#125;&quot;&#x2F;&gt;</span><br><span class="line">        &lt;property name&#x3D;&quot;timeout&quot; value&#x3D;&quot;$&#123;redis_timeout&#125;&quot;&#x2F;&gt;</span><br><span class="line">        &lt;property name&#x3D;&quot;poolConfig&quot; ref&#x3D;&quot;poolConfig&quot;&gt;&lt;&#x2F;property&gt;</span><br><span class="line">    &lt;&#x2F;bean&gt;</span><br><span class="line">&lt;&#x2F;beans&gt;</span><br></pre></td></tr></table></figure><hr><blockquote><p>别忘了还要在spring.xml和web.xml引入我们新添加的文件，引入代码这里就不给出了。最后我们还需要在web.xml中加入spring的session过滤器，我个人理解这个过滤器的作用是告诉spring来接管对session管理与创建工作。</p></blockquote><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--session过滤器--&gt;</span><br><span class="line">&lt;filter&gt;</span><br><span class="line">&lt;filter-name&gt;springSessionRepositoryFilter&lt;&#x2F;filter-name&gt;</span><br><span class="line">&lt;filter-class&gt;org.springframework.web.filter.DelegatingFilterProxy&lt;&#x2F;filter-class&gt;</span><br><span class="line">&lt;&#x2F;filter&gt;</span><br><span class="line">&lt;filter-mapping&gt;</span><br><span class="line">&lt;filter-name&gt;springSessionRepositoryFilter&lt;&#x2F;filter-name&gt;</span><br><span class="line">&lt;url-pattern&gt;&#x2F;*&lt;&#x2F;url-pattern&gt;</span><br><span class="line">&lt;&#x2F;filter-mapping&gt;</span><br><span class="line">&lt;!-- 完成这一步以后，我们对redis的集成就完成了。 --&gt;</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;关于-Nginx-做集群时-遇到-session-丢失的问题&quot;&gt;&lt;a href=&quot;#关于-Nginx-做集群时-遇到-session-丢失的问题&quot; class=&quot;headerlink&quot; title=&quot;关于 Nginx 做集群时 , 遇到 session 丢失的问题
+      
+    
+    </summary>
+    
+    
+      <category term="Nginx" scheme="http://www.some-note.cn/category/Nginx/"/>
+    
+    
+      <category term="Nginx" scheme="http://www.some-note.cn/tag/Nginx/"/>
+    
+      <category term="Session" scheme="http://www.some-note.cn/tag/Session/"/>
+    
+  </entry>
   
   <entry>
     <title>Nginx番外-简单的配置详解</title>
@@ -38,9 +66,9 @@
       <category term="Nginx" scheme="http://www.some-note.cn/category/Nginx/"/>
     
     
-      <category term="配置" scheme="http://www.some-note.cn/tag/%E9%85%8D%E7%BD%AE/"/>
-    
       <category term="Nginx" scheme="http://www.some-note.cn/tag/Nginx/"/>
+    
+      <category term="配置" scheme="http://www.some-note.cn/tag/%E9%85%8D%E7%BD%AE/"/>
     
   </entry>
   

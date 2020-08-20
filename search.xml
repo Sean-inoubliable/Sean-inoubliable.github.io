@@ -1,35 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Nginx主要应用 - 虚拟主机</title>
-    <url>/2020/07/16/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E8%99%9A%E6%8B%9F%E4%B8%BB%E6%9C%BA/</url>
-    <content><![CDATA[<blockquote>
-<ul>
-<li>虚拟主机，就是把一台物理服务器划分成多个‘虚拟’的服务器，这样一台物理服务器就可以当作多个服务器来使用，从而可以配置多个网站</li>
-<li>Nginx 提供虚拟主机的功能，就是为了让我们无需安装多个 Nginx, 就可以运行多个网站</li>
-<li>Nginx 下，一个 server 标签就是一个虚拟主机</li>
-<li>Nginx 的虚拟主机就是通过 nginx.conf 中 server 节点指定的，要想设置多个虚拟主机，配置多个 server 节点即可</li>
-</ul>
-</blockquote>
-<h2 id="配置虚拟主机，通常有一下两种方式"><a href="#配置虚拟主机，通常有一下两种方式" class="headerlink" title="配置虚拟主机，通常有一下两种方式"></a>配置虚拟主机，通常有一下两种方式</h2><h3 id="1-基于端口的虚拟主机"><a href="#1-基于端口的虚拟主机" class="headerlink" title="1. 基于端口的虚拟主机"></a>1. 基于端口的虚拟主机</h3><ul>
-<li>使用端口号来做区分，server 节点中的 listen</li>
-</ul>
-<h3 id="2-基于域名的虚拟主机"><a href="#2-基于域名的虚拟主机" class="headerlink" title="2. 基于域名的虚拟主机"></a>2. 基于域名的虚拟主机</h3><ul>
-<li>使用域名来做区分， server 节点中的 server_name</li>
+    <title>Nginx-配合Redis对所有Tomcat做session共享</title>
+    <url>/2020/08/20/Nginx-%E9%85%8D%E5%90%88Redis%E5%AF%B9%E6%89%80%E6%9C%89Tomcat%E5%81%9Asession%E5%85%B1%E4%BA%AB/</url>
+    <content><![CDATA[<h1 id="关于-Nginx-做集群时-遇到-session-丢失的问题"><a href="#关于-Nginx-做集群时-遇到-session-丢失的问题" class="headerlink" title="关于 Nginx 做集群时 , 遇到 session 丢失的问题"></a>关于 Nginx 做集群时 , 遇到 session 丢失的问题</h1><ul>
+<li>配合 <strong>Redis</strong> 对所有的 <strong>Tomcat</strong> 做 <strong>session 共享</strong></li>
 </ul>
 <hr>
 <blockquote>
-<p>自定义域名，使用时，需修改 <strong>hosts文件配置</strong></p>
+<p>  其实Spring本身就有提供对redis的支持，<br>  就是spring-session，<br>  我们只需将这个在pom.xml添加如下代码，<br>  maven便会自己下载所需的jar包及依赖包。 </p>
 </blockquote>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 例如</span><br><span class="line">192.168.208.128 www.sean.com</span><br></pre></td></tr></table></figure>
-
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">      &lt;groupId&gt;org.springframework.session&lt;&#x2F;groupId&gt;</span><br><span class="line">      &lt;artifactId&gt;spring-session-data-redis&lt;&#x2F;artifactId&gt;</span><br><span class="line">      &lt;version&gt;1.1.1.RELEASE&lt;&#x2F;version&gt;</span><br><span class="line">      &lt;type&gt;pom&lt;&#x2F;type&gt;</span><br><span class="line">&lt;&#x2F;dependency&gt;</span><br></pre></td></tr></table></figure>
+<hr>
 <blockquote>
-<p>文件位置 ： C:\windows\System32\driver\etc\hosts</p>
+<p>随后我们在resources文件夹中新建一个redis.properties，往里面添加如下内容。</p>
 </blockquote>
-]]></content>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#主机地址</span><br><span class="line">redis_hostName &#x3D; </span><br><span class="line">#端口</span><br><span class="line">redis_port &#x3D; </span><br><span class="line">#密码</span><br><span class="line">redis_password &#x3D; </span><br><span class="line">#超时时间</span><br><span class="line">redis_timeout &#x3D;</span><br></pre></td></tr></table></figure>
+<hr>
+<blockquote>
+<p>再新建一个spring-redis.xml，往里面添加我们redis相关的配置。其中maxInactiveIntervalInSeconds是设置session有效时间，以秒为单位，但实际上无论怎么设，session真实有效时间还是会比我们设置的稍微长一些</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;beans xmlns&#x3D;&quot;http:&#x2F;&#x2F;www.springframework.org&#x2F;schema&#x2F;beans&quot;</span><br><span class="line">       xmlns:xsi&#x3D;&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2001&#x2F;XMLSchema-instance&quot;</span><br><span class="line">       xsi:schemaLocation&#x3D;&quot;http:&#x2F;&#x2F;www.springframework.org&#x2F;schema&#x2F;beans</span><br><span class="line">       http:&#x2F;&#x2F;www.springframework.org&#x2F;schema&#x2F;beans&#x2F;spring-beans.xsd&quot;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;!-- session设置 --&gt;</span><br><span class="line">    &lt;bean class&#x3D;&quot;org.springframework.session.data.redis.config.annotation.web.http.RedisHttpSessionConfiguration&quot;&gt;</span><br><span class="line">        &lt;property name&#x3D;&quot;maxInactiveIntervalInSeconds&quot; value&#x3D;&quot;3600&quot;&gt;&lt;&#x2F;property&gt;</span><br><span class="line">    &lt;&#x2F;bean&gt;</span><br><span class="line">    &lt;!-- redis连接池 --&gt;</span><br><span class="line">    &lt;bean id&#x3D;&quot;poolConfig&quot; class&#x3D;&quot;redis.clients.jedis.JedisPoolConfig&quot;&#x2F;&gt;</span><br><span class="line"></span><br><span class="line">    &lt;!-- redis连接工厂 --&gt;</span><br><span class="line">    &lt;bean id&#x3D;&quot;connectionFactory&quot; class&#x3D;&quot;org.springframework.data.redis.connection.jedis.JedisConnectionFactory&quot;&gt;</span><br><span class="line">        &lt;property name&#x3D;&quot;hostName&quot; value&#x3D;&quot;$&#123;redis_hostName&#125;&quot;&#x2F;&gt;</span><br><span class="line">        &lt;property name&#x3D;&quot;port&quot; value&#x3D;&quot;$&#123;redis_port&#125;&quot;&#x2F;&gt;</span><br><span class="line">        &lt;property name&#x3D;&quot;password&quot; value&#x3D;&quot;$&#123;redis_password&#125;&quot;&#x2F;&gt;</span><br><span class="line">        &lt;property name&#x3D;&quot;timeout&quot; value&#x3D;&quot;$&#123;redis_timeout&#125;&quot;&#x2F;&gt;</span><br><span class="line">        &lt;property name&#x3D;&quot;poolConfig&quot; ref&#x3D;&quot;poolConfig&quot;&gt;&lt;&#x2F;property&gt;</span><br><span class="line">    &lt;&#x2F;bean&gt;</span><br><span class="line">&lt;&#x2F;beans&gt;</span><br></pre></td></tr></table></figure>
+<hr>
+<blockquote>
+<p>别忘了还要在spring.xml和web.xml引入我们新添加的文件，引入代码这里就不给出了。最后我们还需要在web.xml中加入spring的session过滤器，我个人理解这个过滤器的作用是告诉spring来接管对session管理与创建工作。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&lt;!--session过滤器--&gt;</span><br><span class="line">&lt;filter&gt;</span><br><span class="line">	&lt;filter-name&gt;springSessionRepositoryFilter&lt;&#x2F;filter-name&gt;</span><br><span class="line">	&lt;filter-class&gt;org.springframework.web.filter.DelegatingFilterProxy&lt;&#x2F;filter-class&gt;</span><br><span class="line">&lt;&#x2F;filter&gt;</span><br><span class="line">&lt;filter-mapping&gt;</span><br><span class="line">	&lt;filter-name&gt;springSessionRepositoryFilter&lt;&#x2F;filter-name&gt;</span><br><span class="line">	&lt;url-pattern&gt;&#x2F;*&lt;&#x2F;url-pattern&gt;</span><br><span class="line">&lt;&#x2F;filter-mapping&gt;</span><br><span class="line">&lt;!-- 完成这一步以后，我们对redis的集成就完成了。 --&gt;</span><br></pre></td></tr></table></figure>]]></content>
       <categories>
         <category>Nginx</category>
       </categories>
+      <tags>
+        <tag>Nginx</tag>
+        <tag>Session</tag>
+      </tags>
   </entry>
   <entry>
     <title>Nginx主要应用 - 动静分离</title>
@@ -52,46 +55,6 @@
       <categories>
         <category>Nginx</category>
       </categories>
-  </entry>
-  <entry>
-    <title>Nginx主要应用 - 静态代理</title>
-    <url>/2020/06/30/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E9%9D%99%E6%80%81%E4%BB%A3%E7%90%86/</url>
-    <content><![CDATA[<ul>
-<li><p>把所有 <strong>静态资源</strong> 的访问改为访问 Nginx, 而不是访问 Tomcat, 因为 Nginx 更擅长于静态资源的处理, 性能更好, 效率更高</p>
-</li>
-<li><p>实际应用中, 我们应该将 <strong>静态资源</strong> 比如 : image / css / html / js 等交给 Nginx 做处理, 而不是由 Tomcat 处理</p>
-</li>
-</ul>
-<h2 id="Nginx静态代理实现的两种方式"><a href="#Nginx静态代理实现的两种方式" class="headerlink" title="Nginx静态代理实现的两种方式"></a>Nginx静态代理实现的两种方式</h2><h3 id="方式一"><a href="#方式一" class="headerlink" title="方式一"></a>方式一</h3><blockquote>
-<p><strong>通过在 Nginx 的 nginx.conf 配置文件中添加静态资源的 location</strong></p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 例如 : ( 表示 () 中这些后缀结尾的文件都由 Nginx 处理 )</span><br><span class="line">location ~.*\.(js|css|html|git|jpg|jpeg|png|doc|ppt|mp3)$ &#123;</span><br><span class="line">    root &#x2F;opt&#x2F;static;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<ul>
-<li><strong>~</strong> 表示正则匹配, 也就是说后面的内容可以是正则表达式匹配</li>
-<li><strong>.</strong> 第一个点, 表示任意字符</li>
-<li><strong>*</strong> 表示一个或多个字符</li>
-<li><strong>\.</strong> 是转义字符, 是后面这个点的转义字符</li>
-<li><strong>|</strong> 表示或者</li>
-<li><strong>$</strong> 表示结尾</li>
-</ul>
-</blockquote>
-<h3 id="方式二"><a href="#方式二" class="headerlink" title="方式二"></a>方式二</h3><blockquote>
-<p>通过在 nginx.conf 配置文件中配置 <strong>静态资源所在目录</strong> 实现</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">location ~.*&#x2F;(css|js|img|images) &#123;</span><br><span class="line">    root &#x2F;opt&#x2F;static;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<blockquote>
-<ul>
-<li>将静态资源放入 /opt/static 目录下, 拦截请求地址中的 ‘String’, 然后用户访问时由 Nginx 返回这些静态资源</li>
-</ul>
-</blockquote>
-]]></content>
-      <categories>
-        <category>Nginx</category>
-      </categories>
-      <tags>
-        <tag>静态代理</tag>
-      </tags>
   </entry>
   <entry>
     <title>Nginx主要应用 - 负载均衡</title>
@@ -168,18 +131,31 @@
       </tags>
   </entry>
   <entry>
-    <title>Nginx主要应用</title>
-    <url>/2020/06/19/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8/</url>
+    <title>Nginx主要应用 - 虚拟主机</title>
+    <url>/2020/07/16/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E8%99%9A%E6%8B%9F%E4%B8%BB%E6%9C%BA/</url>
     <content><![CDATA[<blockquote>
-<p>主要是应用配置文件来实现</p>
-</blockquote>
 <ul>
-<li>静态网站</li>
-<li>负载均衡</li>
-<li>静态代理</li>
-<li>动静分离</li>
-<li>虚拟主机</li>
+<li>虚拟主机，就是把一台物理服务器划分成多个‘虚拟’的服务器，这样一台物理服务器就可以当作多个服务器来使用，从而可以配置多个网站</li>
+<li>Nginx 提供虚拟主机的功能，就是为了让我们无需安装多个 Nginx, 就可以运行多个网站</li>
+<li>Nginx 下，一个 server 标签就是一个虚拟主机</li>
+<li>Nginx 的虚拟主机就是通过 nginx.conf 中 server 节点指定的，要想设置多个虚拟主机，配置多个 server 节点即可</li>
 </ul>
+</blockquote>
+<h2 id="配置虚拟主机，通常有一下两种方式"><a href="#配置虚拟主机，通常有一下两种方式" class="headerlink" title="配置虚拟主机，通常有一下两种方式"></a>配置虚拟主机，通常有一下两种方式</h2><h3 id="1-基于端口的虚拟主机"><a href="#1-基于端口的虚拟主机" class="headerlink" title="1. 基于端口的虚拟主机"></a>1. 基于端口的虚拟主机</h3><ul>
+<li>使用端口号来做区分，server 节点中的 listen</li>
+</ul>
+<h3 id="2-基于域名的虚拟主机"><a href="#2-基于域名的虚拟主机" class="headerlink" title="2. 基于域名的虚拟主机"></a>2. 基于域名的虚拟主机</h3><ul>
+<li>使用域名来做区分， server 节点中的 server_name</li>
+</ul>
+<hr>
+<blockquote>
+<p>自定义域名，使用时，需修改 <strong>hosts文件配置</strong></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 例如</span><br><span class="line">192.168.208.128 www.sean.com</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>文件位置 ： C:\windows\System32\driver\etc\hosts</p>
+</blockquote>
 ]]></content>
       <categories>
         <category>Nginx</category>
@@ -200,134 +176,43 @@
       </tags>
   </entry>
   <entry>
-    <title>Ngxin配置文件</title>
-    <url>/2020/06/18/Ngxin%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/</url>
-    <content><![CDATA[<blockquote>
-<p>学习 <strong>Nginx</strong>, 首先需要对它的核心配置文件 nginx.conf 有一定认识</p>
-</blockquote>
-<blockquote>
-<p>Nginx 的核心配置文件主要由三个部分构成</p>
-</blockquote>
-<p><strong><em>基本配置</em></strong> / <strong><em>events配置</em></strong> / <strong><em>http配置( 基本配置 / 多个server配置 )</em></strong></p>
-<ul>
-<li>看下图</li>
-</ul>
-<p>  <img src="/images/nginx%E9%85%8D%E7%BD%AE%E4%B8%AD%E6%96%87%E8%AF%A6%E8%A7%A3.png" alt=""></p>
-]]></content>
-      <categories>
-        <category>Nginx</category>
-      </categories>
-      <tags>
-        <tag>配置</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Nginx日志管理 &amp; 日志自动备份</title>
-    <url>/2020/08/03/Nginx%E6%97%A5%E5%BF%97%E7%AE%A1%E7%90%86-%E6%97%A5%E5%BF%97%E8%87%AA%E5%8A%A8%E5%A4%87%E4%BB%BD/</url>
+    <title>Nginx主要应用 - 静态代理</title>
+    <url>/2020/06/30/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E9%9D%99%E6%80%81%E4%BB%A3%E7%90%86/</url>
     <content><![CDATA[<ul>
-<li><p>Nginx 是一个非常轻量的 Web服务器，体积小、性能高、速度快等诸多优点。但不足的是也存在缺点，比如其产生的访问日志文件一直就是一个，不会自动地进行切割，如果访问量很大的话，将 导致日志文件容量非常大，不便于管理。当然了，我们也不希望看到这么庞大的一个访问日志文件，那需要手动对这个文件进行切割。</p>
+<li><p>把所有 <strong>静态资源</strong> 的访问改为访问 Nginx, 而不是访问 Tomcat, 因为 Nginx 更擅长于静态资源的处理, 性能更好, 效率更高</p>
 </li>
-<li><p>在 Linux 平台上 Shell 脚本丰富，使用 Shell 脚本加 crontab 命令能非常方便地进行切割</p>
-</li>
-<li><p>由于 Nginx 的日志都是写在一个文件当中的，因此，我们需要每天零点将前一天的日志存为另外一个文件，这里我们就将 Nginx 位于 logs 目录中的 access.log 存为 access_[yyyy-MM-dd].log 的文件。其实 logs 目录中还有个 error.log 的错误日志文件，这个文件也需要每天切割一个，在这里就说 access.log 了，error.log 的切割方法类似。</p>
-</li>
-<li><p>在 Linux 平台上进行切割，需要使用 date 命令以获得昨天的日期、使用 kill 命令向 Nginx 进程发送重新打开日志文件的信号，以及 crontab 设置执行任务周期。</p>
+<li><p>实际应用中, 我们应该将 <strong>静态资源</strong> 比如 : image / css / html / js 等交给 Nginx 做处理, 而不是由 Tomcat 处理</p>
 </li>
 </ul>
-<h2 id="Nginx日志描述"><a href="#Nginx日志描述" class="headerlink" title="Nginx日志描述"></a>Nginx日志描述</h2><ul>
-<li>通过访问日志, 可以得到用户地域来源 / 跳转来源 / 使用终端 / 某个URL访问量等相关信息 ;</li>
-<li>通过错误日志, 可以得到系统某个服务或Server的性能瓶颈等</li>
-<li>将日志好好利用, 可以得到很多有价值的信息</li>
-</ul>
-<h2 id="Nginx日志格式"><a href="#Nginx日志格式" class="headerlink" title="Nginx日志格式"></a>Nginx日志格式</h2><h3 id="nginx-conf配置文件"><a href="#nginx-conf配置文件" class="headerlink" title="nginx.conf配置文件"></a>nginx.conf配置文件</h3><ul>
-<li>通过查看Ngxin配置文件中的 <code>access.log</code><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#这说明, 该Server, 它的访问日志的文件时 Logs&#x2F;host.access.log, 默认使用的格式 &#39;main&#39; 格式</span><br><span class="line">access_log logs&#x2F;host.access.log main;</span><br></pre></td></tr></table></figure></li>
-<li>除了<code>main</code>格式, 还可以自定义其他格式</li>
-<li><code>main</code>的主要格式<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#main格式是我们定义好的一种日志格式, 并起个名字, 便于引用, 以下例子main类型的日志, 记录的remote_addr ... http_x_forwarder.for等选项</span><br><span class="line">log_format main &#39;$remote_addr - $remote_user [$time_local] $request $status $body_bytes_sent $http_referer $http_user_agent $http_x_forwarder_for&#39;;</span><br></pre></td></tr></table></figure></li>
-<li>如默认的main日志格式, 记录以下几项:<ul>
-<li>远程IP-远程用户/用户时间 请求方式 (如GET/POST) 请求body长度 referer来源信息</li>
-<li>http_user_agent 用户代理/蜘蛛, 被转发的请求的原始IP</li>
-<li>http_x_forwarder_for; 在经过代理时, 代理把你的本来的IP加在此头信息中, 传输你的原始IP</li>
-<li>log_format 参数明细表 : <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$remote_addr    #客户端的IP地址(代理服务器, 显示代理服务IP)</span><br><span class="line">$remote_user    #用于记录远程客户端的用户名称(一般为&#39;-&#39;)</span><br><span class="line">$time_local    #用于记录访问时间和时区</span><br><span class="line">$request    #用于请求记录的URL以及请求方法</span><br><span class="line">$status    #响应状态码, 例如: 200成功 &#x2F; 404页面找不到等</span><br><span class="line">$body_bytes_sent    #给客户端发送的文件主题内容字节数</span><br><span class="line">$http_user_agent    #用户所使用的代理(一般为浏览器)</span><br><span class="line">$http_x_forwarder_for    #可以记录客户端IP, 通过代理服务器来记录客户端的IP地址</span><br><span class="line">$http_referer    #可以记录用户是从哪个链接访问过来的</span><br></pre></td></tr></table></figure></li>
-<li>Nginx允许针对不同的Server做不同的log, (有的Web服务器不支持)</li>
-</ul>
-</li>
-</ul>
-<h3 id="实际配置信息"><a href="#实际配置信息" class="headerlink" title="实际配置信息"></a>实际配置信息</h3><ul>
-<li>位置(两种方式)<ul>
-<li>http内, server外</li>
-<li>server内, location下 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#配置后, 重启即可</span><br><span class="line">access_log logs&#x2F;host.access.log main;</span><br></pre></td></tr></table></figure>
-
-</li>
-</ul>
-</li>
-</ul>
-<h3 id="Nginx日志分隔"><a href="#Nginx日志分隔" class="headerlink" title="Nginx日志分隔"></a>Nginx日志分隔</h3><ul>
-<li>Nginx的日志文件没有rotate功能, 编写每天生成一个日志, 我们可以写一个Nginx日志分隔脚本来自动切割日志文件<ul>
-<li>第一步需要对日志文件重命名, 一般日志文件的命名根据时间日期进行命名</li>
-<li>第二步向Nginx朱进程发送USR1信号, Nginx主进程接到信号后会从配置文件中读取日志文件名称, 重新打开日志文件(以配置文件中的日志名称命名), 并以工作进程的用户作为日志文件的所有者, 重新打开日志文件后, Nginx主进程会关闭重命名的日志文件并通知进程使用新打开的日志文件, 工作进程立即打开新的日志文件并关闭重命名的日志文件</li>
-</ul>
-</li>
-</ul>
-<ol>
-<li>以日期命名日志文件名 :</li>
-</ol>
-<ul>
-<li>查看时间/日期 : date命令 </li>
-<li>时间/日期格式化命令: date -d yesterday +%Y%m%d</li>
-</ul>
-<ol start="2">
-<li>编写一个shell脚本, 自动切割日志文件</li>
-</ol>
-<ul>
-<li>创建一个data文件夹, 存放日志文件<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mkdir data</span><br><span class="line">cd data</span><br></pre></td></tr></table></figure></li>
-<li>编写一个shell脚本, runlog.sh — 脚本示例 ( 多选一 )<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#!&#x2F;bin&#x2F;sh</span><br><span class="line">#设置基路径</span><br><span class="line">BASE_DIR&#x3D;&#x2F;usr&#x2F;local&#x2F;nginx</span><br><span class="line">#要切割备份的日志文件名</span><br><span class="line">BASE_FILE_NAME&#x3D;access.log</span><br><span class="line">#日志路径</span><br><span class="line">LOG_PATH&#x3D;$BASE_DIR&#x2F;logs</span><br><span class="line">#日志切割后备份路径</span><br><span class="line">BAK_PATH&#x3D;$BASE_DIR&#x2F;back_up_logs</span><br><span class="line">#切割日志文件</span><br><span class="line">LOG_FILE&#x3D;$LOG_PATH&#x2F;$BASE_FILE_NAME</span><br><span class="line">#获取时间</span><br><span class="line">BAK_TIME&#x3D;&#96;&#x2F;bin&#x2F;date -d yesterday +%Y%m%d%H%M&#96;  &#x2F;&#x2F;为了测试效果，以分钟为单位，故每分钟备份一次，具体按照实际需求设置</span><br><span class="line">#备份文件</span><br><span class="line">BAK_FILE&#x3D;$BAK_PATH&#x2F;$BAK_TIME-$BASE_FILE_NAME</span><br><span class="line">echo $BAK_FILE</span><br><span class="line">#关闭nginx</span><br><span class="line">$BASE_DIR&#x2F;sbin&#x2F;nginx -s stop</span><br><span class="line">#移动切割文件</span><br><span class="line">mv $LOG_FILE $BAK_FILE</span><br><span class="line">#启动nginx</span><br><span class="line">$BASE_DIR&#x2F;sbin&#x2F;nginx</span><br></pre></td></tr></table></figure></li>
-<li>编写一个shell脚本, runlog.sh — 脚本示例 ( 多选一 )<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#!&#x2F;bin&#x2F;bash</span><br><span class="line">LOGS_PATH&#x3D;&#x2F;usr&#x2F;local&#x2F;nginx&#x2F;logs</span><br><span class="line">YESTERDAY&#x3D;$(date -d &quot;yesterday&quot; +%Y-%m-%d)</span><br><span class="line">mv $&#123;LOGS_PATH&#125;&#x2F;sdk_acc.log $&#123;LOGS_PATH&#125;&#x2F;sdk_acc_$&#123;YESTERDAY&#125;.log</span><br><span class="line">mv $&#123;LOGS_PATH&#125;&#x2F;sell_acc.log $&#123;LOGS_PATH&#125;&#x2F;sell_acc_$&#123;YESTERDAY&#125;.log</span><br><span class="line">kill -USR1 $(cat &#x2F;usr&#x2F;local&#x2F;nginx&#x2F;nginx.pid)       # 向 Nginx 主进程发送 USR1 信号。USR1 信号是重新打开日志文件</span><br></pre></td></tr></table></figure></li>
-</ul>
-<ol start="3">
-<li>Linux定时任务, 旨在执行 shell 脚本</li>
-</ol>
-<ul>
-<li><p>命令</p>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#编辑定时任务</span><br><span class="line">crontab -e</span><br><span class="line"></span><br><span class="line">#输入定时设置, 例举一小时执行一次 (cron表达式)</span><br><span class="line">#每小时的第59分钟执行该shell脚本进行日志切割备份</span><br><span class="line">59 *&#x2F;1 * * * sh &#39;shell脚本位置&#39;</span><br><span class="line"></span><br><span class="line">#保存退出后, 自动开始执行</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>脚本授权</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 脚本授权</span><br><span class="line">chmod 755 log.sh</span><br><span class="line"></span><br><span class="line"># 创建定时任务调度,并执行(保存退出即可自动开始执行定时任务)</span><br><span class="line"># 执行该命令设置定时任务配置</span><br><span class="line">crontab -e</span><br><span class="line"># 添加如下配置,保存退出</span><br><span class="line">*&#x2F;1 * * * * sh &#x2F;usr&#x2F;local&#x2F;nginx&#x2F;sbin&#x2F;log.sh</span><br><span class="line"></span><br><span class="line">#关闭定时任务</span><br><span class="line">crontab -l #查看所有定时任务</span><br><span class="line">crontab -r #删除所有定时任务</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li>cron 表达式参考 <a href="https://crontab.guru/" target="_blank" rel="noopener">点我点我</a></li>
-</ul>
-<h2 id="crontab"><a href="#crontab" class="headerlink" title="crontab"></a>crontab</h2><blockquote>
-<p>crontab -e //编辑某个用户的cron服务 //这个最重要，自己编写crontab</p>
+<h2 id="Nginx静态代理实现的两种方式"><a href="#Nginx静态代理实现的两种方式" class="headerlink" title="Nginx静态代理实现的两种方式"></a>Nginx静态代理实现的两种方式</h2><h3 id="方式一"><a href="#方式一" class="headerlink" title="方式一"></a>方式一</h3><blockquote>
+<p><strong>通过在 Nginx 的 nginx.conf 配置文件中添加静态资源的 location</strong></p>
 </blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 例如 : ( 表示 () 中这些后缀结尾的文件都由 Nginx 处理 )</span><br><span class="line">location ~.*\.(js|css|html|git|jpg|jpeg|png|doc|ppt|mp3)$ &#123;</span><br><span class="line">    root &#x2F;opt&#x2F;static;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <blockquote>
-<p>crontab -l //列出某个用户cron服务的详细内容//这个也重要，查看自己写了哪些定时任务</p>
+<ul>
+<li><strong>~</strong> 表示正则匹配, 也就是说后面的内容可以是正则表达式匹配</li>
+<li><strong>.</strong> 第一个点, 表示任意字符</li>
+<li><strong>*</strong> 表示一个或多个字符</li>
+<li><strong>\.</strong> 是转义字符, 是后面这个点的转义字符</li>
+<li><strong>|</strong> 表示或者</li>
+<li><strong>$</strong> 表示结尾</li>
+</ul>
 </blockquote>
-<blockquote>
-<p>crontab -u //设定某个用户的cron服务，一般root用户在执行这个命令的时候需要此参数</p>
+<h3 id="方式二"><a href="#方式二" class="headerlink" title="方式二"></a>方式二</h3><blockquote>
+<p>通过在 nginx.conf 配置文件中配置 <strong>静态资源所在目录</strong> 实现</p>
 </blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">location ~.*&#x2F;(css|js|img|images) &#123;</span><br><span class="line">    root &#x2F;opt&#x2F;static;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <blockquote>
-<p>crontab -r //删除某个用户的cron服务</p>
+<ul>
+<li>将静态资源放入 /opt/static 目录下, 拦截请求地址中的 ‘String’, 然后用户访问时由 Nginx 返回这些静态资源</li>
+</ul>
 </blockquote>
 ]]></content>
       <categories>
         <category>Nginx</category>
       </categories>
       <tags>
-        <tag>Nginx</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Nginx番外-简单的配置详解</title>
-    <url>/2020/08/20/Nginx%E7%95%AA%E5%A4%96-%E7%AE%80%E5%8D%95%E7%9A%84%E9%85%8D%E7%BD%AE%E8%AF%A6%E8%A7%A3/</url>
-    <content><![CDATA[<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#开启进程数 &lt;&#x3D;CPU数 </span><br><span class="line">worker_processes  1;</span><br><span class="line">#自定义错误日志保存位置，全局设置，默认logs&#x2F;error.log</span><br><span class="line">#error_log  logs&#x2F;error.log;</span><br><span class="line">#每个进程最大连接数（最大连接&#x3D;连接数x进程数）每个worker允许同时产生多少个链接，默认1024</span><br><span class="line">events &#123;</span><br><span class="line">    worker_connections  1024;</span><br><span class="line">&#125;</span><br><span class="line">#</span><br><span class="line">http &#123;</span><br><span class="line">    #文件扩展名与文件类型映射表</span><br><span class="line">    include       mime.types;</span><br><span class="line">    #默认文件类型</span><br><span class="line">    default_type  application&#x2F;octet-stream;</span><br><span class="line">    #自定义日志文件输出格式 全局设置</span><br><span class="line">    log_format  main  &#39;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &#39;</span><br><span class="line">              &#39;$status $body_bytes_sent &quot;$http_referer&quot; &#39;</span><br><span class="line">              &#39;&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;&#39;;</span><br><span class="line">    #自定义全局请求日志保存位置，全局设置，默认logs&#x2F;access.log， 定义格式：文件存储位置 + 日志输出格式</span><br><span class="line">    #access_log  logs&#x2F;access.log  main;</span><br><span class="line">    #打开发送文件</span><br><span class="line">    sendfile        on;</span><br><span class="line">    #连接超时时间</span><br><span class="line">    #keepalive_timeout  0;</span><br><span class="line">    keepalive_timeout  65;</span><br><span class="line">    #打开gzip压缩</span><br><span class="line">    #gzip  on;</span><br><span class="line">    #配置虚拟主机，基于域名、ip和端口，可以配置多个server</span><br><span class="line">    server &#123;</span><br><span class="line">        #监听端口，可以是ip:port 或者 port</span><br><span class="line">        listen       80;</span><br><span class="line">        #监听域名,可以是ip或者域名，server_name有三种匹配方式：精准匹配（www.domain.com）、通配符匹配（*.domain.com 、www.*）、正则表达式匹配（~^(?.+)\.domain\.com$）</span><br><span class="line">        server_name  localhost;</span><br><span class="line">        #自定义请求日志，局部，当前server有效</span><br><span class="line">        #access_log  logs&#x2F;host.access.log  main;</span><br><span class="line">        #错误页面及其返回地址</span><br><span class="line">        error_page   500 502 503 504  &#x2F;50x.html;</span><br><span class="line">        #请求匹配，同样有精准（&#x3D; &#x2F;index.html）、模糊（~ index）、正则，允许配置多个location</span><br><span class="line">        location &#x2F; &#123;</span><br><span class="line">            #返回根路径地址（相对路径:相对于&#x2F;usr&#x2F;local&#x2F;nginx&#x2F;）</span><br><span class="line">            root   html;</span><br><span class="line">            #默认主页</span><br><span class="line">            index  index.html index.htm;</span><br><span class="line">        &#125;</span><br><span class="line">        #</span><br><span class="line">        location &#x2F;html &#123;</span><br><span class="line">            root   html;</span><br><span class="line">            index  index.html index.htm;</span><br><span class="line">        &#125;</span><br><span class="line">        #</span><br><span class="line">    &#125;</span><br><span class="line">    #</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
-      <categories>
-        <category>Nginx</category>
-      </categories>
-      <tags>
-        <tag>配置</tag>
-        <tag>Nginx</tag>
+        <tag>静态代理</tag>
       </tags>
   </entry>
   <entry>
@@ -461,6 +346,143 @@
       </tags>
   </entry>
   <entry>
+    <title>Nginx日志管理 &amp; 日志自动备份</title>
+    <url>/2020/08/03/Nginx%E6%97%A5%E5%BF%97%E7%AE%A1%E7%90%86-%E6%97%A5%E5%BF%97%E8%87%AA%E5%8A%A8%E5%A4%87%E4%BB%BD/</url>
+    <content><![CDATA[<ul>
+<li><p>Nginx 是一个非常轻量的 Web服务器，体积小、性能高、速度快等诸多优点。但不足的是也存在缺点，比如其产生的访问日志文件一直就是一个，不会自动地进行切割，如果访问量很大的话，将 导致日志文件容量非常大，不便于管理。当然了，我们也不希望看到这么庞大的一个访问日志文件，那需要手动对这个文件进行切割。</p>
+</li>
+<li><p>在 Linux 平台上 Shell 脚本丰富，使用 Shell 脚本加 crontab 命令能非常方便地进行切割</p>
+</li>
+<li><p>由于 Nginx 的日志都是写在一个文件当中的，因此，我们需要每天零点将前一天的日志存为另外一个文件，这里我们就将 Nginx 位于 logs 目录中的 access.log 存为 access_[yyyy-MM-dd].log 的文件。其实 logs 目录中还有个 error.log 的错误日志文件，这个文件也需要每天切割一个，在这里就说 access.log 了，error.log 的切割方法类似。</p>
+</li>
+<li><p>在 Linux 平台上进行切割，需要使用 date 命令以获得昨天的日期、使用 kill 命令向 Nginx 进程发送重新打开日志文件的信号，以及 crontab 设置执行任务周期。</p>
+</li>
+</ul>
+<h2 id="Nginx日志描述"><a href="#Nginx日志描述" class="headerlink" title="Nginx日志描述"></a>Nginx日志描述</h2><ul>
+<li>通过访问日志, 可以得到用户地域来源 / 跳转来源 / 使用终端 / 某个URL访问量等相关信息 ;</li>
+<li>通过错误日志, 可以得到系统某个服务或Server的性能瓶颈等</li>
+<li>将日志好好利用, 可以得到很多有价值的信息</li>
+</ul>
+<h2 id="Nginx日志格式"><a href="#Nginx日志格式" class="headerlink" title="Nginx日志格式"></a>Nginx日志格式</h2><h3 id="nginx-conf配置文件"><a href="#nginx-conf配置文件" class="headerlink" title="nginx.conf配置文件"></a>nginx.conf配置文件</h3><ul>
+<li>通过查看Ngxin配置文件中的 <code>access.log</code><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#这说明, 该Server, 它的访问日志的文件时 Logs&#x2F;host.access.log, 默认使用的格式 &#39;main&#39; 格式</span><br><span class="line">access_log logs&#x2F;host.access.log main;</span><br></pre></td></tr></table></figure></li>
+<li>除了<code>main</code>格式, 还可以自定义其他格式</li>
+<li><code>main</code>的主要格式<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#main格式是我们定义好的一种日志格式, 并起个名字, 便于引用, 以下例子main类型的日志, 记录的remote_addr ... http_x_forwarder.for等选项</span><br><span class="line">log_format main &#39;$remote_addr - $remote_user [$time_local] $request $status $body_bytes_sent $http_referer $http_user_agent $http_x_forwarder_for&#39;;</span><br></pre></td></tr></table></figure></li>
+<li>如默认的main日志格式, 记录以下几项:<ul>
+<li>远程IP-远程用户/用户时间 请求方式 (如GET/POST) 请求body长度 referer来源信息</li>
+<li>http_user_agent 用户代理/蜘蛛, 被转发的请求的原始IP</li>
+<li>http_x_forwarder_for; 在经过代理时, 代理把你的本来的IP加在此头信息中, 传输你的原始IP</li>
+<li>log_format 参数明细表 : <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">$remote_addr    #客户端的IP地址(代理服务器, 显示代理服务IP)</span><br><span class="line">$remote_user    #用于记录远程客户端的用户名称(一般为&#39;-&#39;)</span><br><span class="line">$time_local    #用于记录访问时间和时区</span><br><span class="line">$request    #用于请求记录的URL以及请求方法</span><br><span class="line">$status    #响应状态码, 例如: 200成功 &#x2F; 404页面找不到等</span><br><span class="line">$body_bytes_sent    #给客户端发送的文件主题内容字节数</span><br><span class="line">$http_user_agent    #用户所使用的代理(一般为浏览器)</span><br><span class="line">$http_x_forwarder_for    #可以记录客户端IP, 通过代理服务器来记录客户端的IP地址</span><br><span class="line">$http_referer    #可以记录用户是从哪个链接访问过来的</span><br></pre></td></tr></table></figure></li>
+<li>Nginx允许针对不同的Server做不同的log, (有的Web服务器不支持)</li>
+</ul>
+</li>
+</ul>
+<h3 id="实际配置信息"><a href="#实际配置信息" class="headerlink" title="实际配置信息"></a>实际配置信息</h3><ul>
+<li>位置(两种方式)<ul>
+<li>http内, server外</li>
+<li>server内, location下 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#配置后, 重启即可</span><br><span class="line">access_log logs&#x2F;host.access.log main;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="Nginx日志分隔"><a href="#Nginx日志分隔" class="headerlink" title="Nginx日志分隔"></a>Nginx日志分隔</h3><ul>
+<li>Nginx的日志文件没有rotate功能, 编写每天生成一个日志, 我们可以写一个Nginx日志分隔脚本来自动切割日志文件<ul>
+<li>第一步需要对日志文件重命名, 一般日志文件的命名根据时间日期进行命名</li>
+<li>第二步向Nginx朱进程发送USR1信号, Nginx主进程接到信号后会从配置文件中读取日志文件名称, 重新打开日志文件(以配置文件中的日志名称命名), 并以工作进程的用户作为日志文件的所有者, 重新打开日志文件后, Nginx主进程会关闭重命名的日志文件并通知进程使用新打开的日志文件, 工作进程立即打开新的日志文件并关闭重命名的日志文件</li>
+</ul>
+</li>
+</ul>
+<ol>
+<li>以日期命名日志文件名 :</li>
+</ol>
+<ul>
+<li>查看时间/日期 : date命令 </li>
+<li>时间/日期格式化命令: date -d yesterday +%Y%m%d</li>
+</ul>
+<ol start="2">
+<li>编写一个shell脚本, 自动切割日志文件</li>
+</ol>
+<ul>
+<li>创建一个data文件夹, 存放日志文件<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mkdir data</span><br><span class="line">cd data</span><br></pre></td></tr></table></figure></li>
+<li>编写一个shell脚本, runlog.sh — 脚本示例 ( 多选一 )<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#!&#x2F;bin&#x2F;sh</span><br><span class="line">#设置基路径</span><br><span class="line">BASE_DIR&#x3D;&#x2F;usr&#x2F;local&#x2F;nginx</span><br><span class="line">#要切割备份的日志文件名</span><br><span class="line">BASE_FILE_NAME&#x3D;access.log</span><br><span class="line">#日志路径</span><br><span class="line">LOG_PATH&#x3D;$BASE_DIR&#x2F;logs</span><br><span class="line">#日志切割后备份路径</span><br><span class="line">BAK_PATH&#x3D;$BASE_DIR&#x2F;back_up_logs</span><br><span class="line">#切割日志文件</span><br><span class="line">LOG_FILE&#x3D;$LOG_PATH&#x2F;$BASE_FILE_NAME</span><br><span class="line">#获取时间</span><br><span class="line">BAK_TIME&#x3D;&#96;&#x2F;bin&#x2F;date -d yesterday +%Y%m%d%H%M&#96;  &#x2F;&#x2F;为了测试效果，以分钟为单位，故每分钟备份一次，具体按照实际需求设置</span><br><span class="line">#备份文件</span><br><span class="line">BAK_FILE&#x3D;$BAK_PATH&#x2F;$BAK_TIME-$BASE_FILE_NAME</span><br><span class="line">echo $BAK_FILE</span><br><span class="line">#关闭nginx</span><br><span class="line">$BASE_DIR&#x2F;sbin&#x2F;nginx -s stop</span><br><span class="line">#移动切割文件</span><br><span class="line">mv $LOG_FILE $BAK_FILE</span><br><span class="line">#启动nginx</span><br><span class="line">$BASE_DIR&#x2F;sbin&#x2F;nginx</span><br></pre></td></tr></table></figure></li>
+<li>编写一个shell脚本, runlog.sh — 脚本示例 ( 多选一 )<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#!&#x2F;bin&#x2F;bash</span><br><span class="line">LOGS_PATH&#x3D;&#x2F;usr&#x2F;local&#x2F;nginx&#x2F;logs</span><br><span class="line">YESTERDAY&#x3D;$(date -d &quot;yesterday&quot; +%Y-%m-%d)</span><br><span class="line">mv $&#123;LOGS_PATH&#125;&#x2F;sdk_acc.log $&#123;LOGS_PATH&#125;&#x2F;sdk_acc_$&#123;YESTERDAY&#125;.log</span><br><span class="line">mv $&#123;LOGS_PATH&#125;&#x2F;sell_acc.log $&#123;LOGS_PATH&#125;&#x2F;sell_acc_$&#123;YESTERDAY&#125;.log</span><br><span class="line">kill -USR1 $(cat &#x2F;usr&#x2F;local&#x2F;nginx&#x2F;nginx.pid)       # 向 Nginx 主进程发送 USR1 信号。USR1 信号是重新打开日志文件</span><br></pre></td></tr></table></figure></li>
+</ul>
+<ol start="3">
+<li>Linux定时任务, 旨在执行 shell 脚本</li>
+</ol>
+<ul>
+<li><p>命令</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#编辑定时任务</span><br><span class="line">crontab -e</span><br><span class="line"></span><br><span class="line">#输入定时设置, 例举一小时执行一次 (cron表达式)</span><br><span class="line">#每小时的第59分钟执行该shell脚本进行日志切割备份</span><br><span class="line">59 *&#x2F;1 * * * sh &#39;shell脚本位置&#39;</span><br><span class="line"></span><br><span class="line">#保存退出后, 自动开始执行</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>脚本授权</p>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 脚本授权</span><br><span class="line">chmod 755 log.sh</span><br><span class="line"></span><br><span class="line"># 创建定时任务调度,并执行(保存退出即可自动开始执行定时任务)</span><br><span class="line"># 执行该命令设置定时任务配置</span><br><span class="line">crontab -e</span><br><span class="line"># 添加如下配置,保存退出</span><br><span class="line">*&#x2F;1 * * * * sh &#x2F;usr&#x2F;local&#x2F;nginx&#x2F;sbin&#x2F;log.sh</span><br><span class="line"></span><br><span class="line">#关闭定时任务</span><br><span class="line">crontab -l #查看所有定时任务</span><br><span class="line">crontab -r #删除所有定时任务</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>cron 表达式参考 <a href="https://crontab.guru/" target="_blank" rel="noopener">点我点我</a></li>
+</ul>
+<h2 id="crontab"><a href="#crontab" class="headerlink" title="crontab"></a>crontab</h2><blockquote>
+<p>crontab -e //编辑某个用户的cron服务 //这个最重要，自己编写crontab</p>
+</blockquote>
+<blockquote>
+<p>crontab -l //列出某个用户cron服务的详细内容//这个也重要，查看自己写了哪些定时任务</p>
+</blockquote>
+<blockquote>
+<p>crontab -u //设定某个用户的cron服务，一般root用户在执行这个命令的时候需要此参数</p>
+</blockquote>
+<blockquote>
+<p>crontab -r //删除某个用户的cron服务</p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>Nginx</category>
+      </categories>
+      <tags>
+        <tag>Nginx</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Nginx主要应用</title>
+    <url>/2020/06/19/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8/</url>
+    <content><![CDATA[<blockquote>
+<p>主要是应用配置文件来实现</p>
+</blockquote>
+<ul>
+<li>静态网站</li>
+<li>负载均衡</li>
+<li>静态代理</li>
+<li>动静分离</li>
+<li>虚拟主机</li>
+</ul>
+]]></content>
+      <categories>
+        <category>Nginx</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>Ngxin配置文件</title>
+    <url>/2020/06/18/Ngxin%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/</url>
+    <content><![CDATA[<blockquote>
+<p>学习 <strong>Nginx</strong>, 首先需要对它的核心配置文件 nginx.conf 有一定认识</p>
+</blockquote>
+<blockquote>
+<p>Nginx 的核心配置文件主要由三个部分构成</p>
+</blockquote>
+<p><strong><em>基本配置</em></strong> / <strong><em>events配置</em></strong> / <strong><em>http配置( 基本配置 / 多个server配置 )</em></strong></p>
+<ul>
+<li>看下图</li>
+</ul>
+<p>  <img src="/images/nginx%E9%85%8D%E7%BD%AE%E4%B8%AD%E6%96%87%E8%AF%A6%E8%A7%A3.png" alt=""></p>
+]]></content>
+      <categories>
+        <category>Nginx</category>
+      </categories>
+      <tags>
+        <tag>配置</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Hello World</title>
     <url>/2020/06/15/hello-world/</url>
     <content><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
@@ -477,5 +499,17 @@
 
 <p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p>
 ]]></content>
+  </entry>
+  <entry>
+    <title>Nginx番外-简单的配置详解</title>
+    <url>/2020/08/20/Nginx%E7%95%AA%E5%A4%96-%E7%AE%80%E5%8D%95%E7%9A%84%E9%85%8D%E7%BD%AE%E8%AF%A6%E8%A7%A3/</url>
+    <content><![CDATA[<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#开启进程数 &lt;&#x3D;CPU数 </span><br><span class="line">worker_processes  1;</span><br><span class="line">#自定义错误日志保存位置，全局设置，默认logs&#x2F;error.log</span><br><span class="line">#error_log  logs&#x2F;error.log;</span><br><span class="line">#每个进程最大连接数（最大连接&#x3D;连接数x进程数）每个worker允许同时产生多少个链接，默认1024</span><br><span class="line">events &#123;</span><br><span class="line">    worker_connections  1024;</span><br><span class="line">&#125;</span><br><span class="line">#</span><br><span class="line">http &#123;</span><br><span class="line">    #文件扩展名与文件类型映射表</span><br><span class="line">    include       mime.types;</span><br><span class="line">    #默认文件类型</span><br><span class="line">    default_type  application&#x2F;octet-stream;</span><br><span class="line">    #自定义日志文件输出格式 全局设置</span><br><span class="line">    log_format  main  &#39;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &#39;</span><br><span class="line">              &#39;$status $body_bytes_sent &quot;$http_referer&quot; &#39;</span><br><span class="line">              &#39;&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;&#39;;</span><br><span class="line">    #自定义全局请求日志保存位置，全局设置，默认logs&#x2F;access.log， 定义格式：文件存储位置 + 日志输出格式</span><br><span class="line">    #access_log  logs&#x2F;access.log  main;</span><br><span class="line">    #打开发送文件</span><br><span class="line">    sendfile        on;</span><br><span class="line">    #连接超时时间</span><br><span class="line">    #keepalive_timeout  0;</span><br><span class="line">    keepalive_timeout  65;</span><br><span class="line">    #打开gzip压缩</span><br><span class="line">    #gzip  on;</span><br><span class="line">    #配置虚拟主机，基于域名、ip和端口，可以配置多个server</span><br><span class="line">    server &#123;</span><br><span class="line">        #监听端口，可以是ip:port 或者 port</span><br><span class="line">        listen       80;</span><br><span class="line">        #监听域名,可以是ip或者域名，server_name有三种匹配方式：精准匹配（www.domain.com）、通配符匹配（*.domain.com 、www.*）、正则表达式匹配（~^(?.+)\.domain\.com$）</span><br><span class="line">        server_name  localhost;</span><br><span class="line">        #自定义请求日志，局部，当前server有效</span><br><span class="line">        #access_log  logs&#x2F;host.access.log  main;</span><br><span class="line">        #错误页面及其返回地址</span><br><span class="line">        error_page   500 502 503 504  &#x2F;50x.html;</span><br><span class="line">        #请求匹配，同样有精准（&#x3D; &#x2F;index.html）、模糊（~ index）、正则，允许配置多个location</span><br><span class="line">        location &#x2F; &#123;</span><br><span class="line">            #返回根路径地址（相对路径:相对于&#x2F;usr&#x2F;local&#x2F;nginx&#x2F;）</span><br><span class="line">            root   html;</span><br><span class="line">            #默认主页</span><br><span class="line">            index  index.html index.htm;</span><br><span class="line">        &#125;</span><br><span class="line">        #</span><br><span class="line">        location &#x2F;html &#123;</span><br><span class="line">            root   html;</span><br><span class="line">            index  index.html index.htm;</span><br><span class="line">        &#125;</span><br><span class="line">        #</span><br><span class="line">    &#125;</span><br><span class="line">    #</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>Nginx</category>
+      </categories>
+      <tags>
+        <tag>Nginx</tag>
+        <tag>配置</tag>
+      </tags>
   </entry>
 </search>
