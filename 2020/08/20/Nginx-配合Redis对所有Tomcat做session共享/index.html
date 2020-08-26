@@ -1,4 +1,193 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta http-equiv="content-type" content="text/html; charset=utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" name="viewport"><meta content="yes" name="apple-mobile-web-app-capable"><meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"><meta content="telephone=no" name="format-detection"><meta name="description" content="何必那么认真"><title>Nginx-配合Redis对所有Tomcat做session共享 | Sean's Blog</title><link rel="stylesheet" type="text/css" href="/css/style.css?v=0.0.0"><link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/normalize.css/normalize.min.css"><link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/purecss/build/pure-min.min.css"><link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/purecss/build/grids-responsive-min.css"><link rel="stylesheet" href="//cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css"><script type="text/javascript" src="//cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script><link rel="icon" mask="" sizes="any" href="/favicon.ico"><link rel="Shortcut Icon" type="image/x-icon" href="/favicon.ico"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><link rel="apple-touch-icon-precomposed" href="/apple-touch-icon.png"><link rel="alternate" type="application/atom+xml" href="/atom.xml"><script type="text/javascript" src="//cdn.jsdelivr.net/npm/clipboard/dist/clipboard.min.js"></script><script type="text/javascript" src="//cdn.jsdelivr.net/gh/codeseven/toastr/build/toastr.min.js"></script><link rel="stylesheet" href="//cdn.jsdelivr.net/gh/codeseven/toastr/build/toastr.min.css"><meta name="generator" content="Hexo 4.2.1"></head><body><div class="body_container"><div id="header"><div class="site-name"><h1 class="hidden">Nginx-配合Redis对所有Tomcat做session共享</h1><a id="logo" href="/.">Sean's Blog</a><p class="description">why so serious ?</p></div><div id="nav-menu"><a class="current" href="/."><i class="fa fa-home"> 首页</i></a><a href="/archives/"><i class="fa fa-archive"> 归档</i></a></div></div><div class="pure-g" id="layout"><div class="pure-u-1 pure-u-md-3-4"><div class="content_container"><div class="post"><h1 class="post-title">Nginx-配合Redis对所有Tomcat做session共享</h1><div class="post-meta">2020-08-20<span> | </span><span class="category"><a href="/category/Nginx/">Nginx</a></span></div><div class="post-content"><h1 id="关于-Nginx-做集群时-遇到-session-丢失的问题"><a href="#关于-Nginx-做集群时-遇到-session-丢失的问题" class="headerlink" title="关于 Nginx 做集群时 , 遇到 session 丢失的问题"></a>关于 Nginx 做集群时 , 遇到 session 丢失的问题</h1><ul>
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>Nginx-配合Redis对所有Tomcat做session共享 | Sean&#39;s Blog | why so serious ?</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="Nginx,Session">
+    <meta name="description" content="关于 Nginx 做集群时 , 遇到 session 丢失的问题 配合 Redis 对所有的 Tomcat 做 session 共享      其实Spring本身就有提供对redis的支持，  就是spring-session，  我们只需将这个在pom.xml添加如下代码，  maven便会自己下载所需的jar包及依赖包。   123456&lt;dependency&gt;      &amp;lt">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Nginx-配合Redis对所有Tomcat做session共享">
+<meta property="og:url" content="http://www.some-note.cn/2020/08/20/Nginx-%E9%85%8D%E5%90%88Redis%E5%AF%B9%E6%89%80%E6%9C%89Tomcat%E5%81%9Asession%E5%85%B1%E4%BA%AB/index.html">
+<meta property="og:site_name" content="Sean&#39;s Blog">
+<meta property="og:description" content="关于 Nginx 做集群时 , 遇到 session 丢失的问题 配合 Redis 对所有的 Tomcat 做 session 共享      其实Spring本身就有提供对redis的支持，  就是spring-session，  我们只需将这个在pom.xml添加如下代码，  maven便会自己下载所需的jar包及依赖包。   123456&lt;dependency&gt;      &amp;lt">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-08-20T02:22:36.000Z">
+<meta property="article:modified_time" content="2020-08-26T02:09:57.935Z">
+<meta property="article:author" content="Sean">
+<meta property="article:tag" content="Nginx">
+<meta property="article:tag" content="Session">
+<meta name="twitter:card" content="summary">
+    
+        <link rel="alternate" type="application/atom+xml" title="Sean&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Sean</h5>
+          <a href="mailto:inoubliable_s@163.com" title="inoubliable_s@163.com" class="mail">inoubliable_s@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Sean-inoubliable" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Nginx-配合Redis对所有Tomcat做session共享</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Nginx-配合Redis对所有Tomcat做session共享</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2020-08-20T02:22:36.000Z" itemprop="datePublished" class="page-time">
+  2020-08-20
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Nginx/">Nginx</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#关于-Nginx-做集群时-遇到-session-丢失的问题"><span class="post-toc-number">1.</span> <span class="post-toc-text">关于 Nginx 做集群时 , 遇到 session 丢失的问题</span></a></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-Nginx-配合Redis对所有Tomcat做session共享"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Nginx-配合Redis对所有Tomcat做session共享</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2020-08-20 10:22:36" datetime="2020-08-20T02:22:36.000Z"  itemprop="datePublished">2020-08-20</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/Nginx/">Nginx</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="关于-Nginx-做集群时-遇到-session-丢失的问题"><a href="#关于-Nginx-做集群时-遇到-session-丢失的问题" class="headerlink" title="关于 Nginx 做集群时 , 遇到 session 丢失的问题"></a>关于 Nginx 做集群时 , 遇到 session 丢失的问题</h1><ul>
 <li>配合 <strong>Redis</strong> 对所有的 <strong>Tomcat</strong> 做 <strong>session 共享</strong></li>
 </ul>
 <hr>
@@ -20,4 +209,300 @@
 <blockquote>
 <p>别忘了还要在spring.xml和web.xml引入我们新添加的文件，引入代码这里就不给出了。最后我们还需要在web.xml中加入spring的session过滤器，我个人理解这个过滤器的作用是告诉spring来接管对session管理与创建工作。</p>
 </blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--session过滤器--&gt;</span><br><span class="line">&lt;filter&gt;</span><br><span class="line">	&lt;filter-name&gt;springSessionRepositoryFilter&lt;&#x2F;filter-name&gt;</span><br><span class="line">	&lt;filter-class&gt;org.springframework.web.filter.DelegatingFilterProxy&lt;&#x2F;filter-class&gt;</span><br><span class="line">&lt;&#x2F;filter&gt;</span><br><span class="line">&lt;filter-mapping&gt;</span><br><span class="line">	&lt;filter-name&gt;springSessionRepositoryFilter&lt;&#x2F;filter-name&gt;</span><br><span class="line">	&lt;url-pattern&gt;&#x2F;*&lt;&#x2F;url-pattern&gt;</span><br><span class="line">&lt;&#x2F;filter-mapping&gt;</span><br><span class="line">&lt;!-- 完成这一步以后，我们对redis的集成就完成了。 --&gt;</span><br></pre></td></tr></table></figure></div><div class="tags"><a href="/tag/Nginx/"><i class="fa fa-tag"></i>Nginx</a><a href="/tag/Session/"><i class="fa fa-tag"></i>Session</a></div><div class="post-nav"><a class="next" href="/2020/08/20/Nginx%E7%95%AA%E5%A4%96-%E7%AE%80%E5%8D%95%E7%9A%84%E9%85%8D%E7%BD%AE%E8%AF%A6%E8%A7%A3/">Nginx番外-简单的配置详解</a></div></div></div></div><div class="pure-u-1 pure-u-md-1-4"><div id="sidebar"><div class="widget"><div class="widget-title"><i class="fa fa-folder-o"> 分类</i></div><ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/category/Nginx/">Nginx</a><span class="category-list-count">12</span></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-star-o"> 标签</i></div><div class="tagcloud"><a href="/tag/Nginx/" style="font-size: 15px;">Nginx</a> <a href="/tag/Session/" style="font-size: 15px;">Session</a> <a href="/tag/%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/" style="font-size: 15px;">负载均衡</a> <a href="/tag/%E9%9D%99%E6%80%81%E7%BD%91%E7%AB%99/" style="font-size: 15px;">静态网站</a> <a href="/tag/%E9%9D%99%E6%80%81%E4%BB%A3%E7%90%86/" style="font-size: 15px;">静态代理</a> <a href="/tag/%E7%AE%80%E4%BB%8B/" style="font-size: 15px;">简介</a> <a href="/tag/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" style="font-size: 15px;">环境搭建</a> <a href="/tag/%E9%85%8D%E7%BD%AE/" style="font-size: 15px;">配置</a></div></div><div class="widget"><div class="widget-title"><i class="fa fa-file-o"> 最近文章</i></div><ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2020/08/20/Nginx-%E9%85%8D%E5%90%88Redis%E5%AF%B9%E6%89%80%E6%9C%89Tomcat%E5%81%9Asession%E5%85%B1%E4%BA%AB/">Nginx-配合Redis对所有Tomcat做session共享</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/08/20/Nginx%E7%95%AA%E5%A4%96-%E7%AE%80%E5%8D%95%E7%9A%84%E9%85%8D%E7%BD%AE%E8%AF%A6%E8%A7%A3/">Nginx番外-简单的配置详解</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/08/03/Nginx%E6%97%A5%E5%BF%97%E7%AE%A1%E7%90%86-%E6%97%A5%E5%BF%97%E8%87%AA%E5%8A%A8%E5%A4%87%E4%BB%BD/">Nginx日志管理 & 日志自动备份</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/07/16/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E8%99%9A%E6%8B%9F%E4%B8%BB%E6%9C%BA/">Nginx主要应用 - 虚拟主机</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/07/16/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E5%8A%A8%E9%9D%99%E5%88%86%E7%A6%BB/">Nginx主要应用 - 动静分离</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/06/30/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E9%9D%99%E6%80%81%E4%BB%A3%E7%90%86/">Nginx主要应用 - 静态代理</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/06/29/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1/">Nginx主要应用 - 负载均衡</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/06/22/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E9%9D%99%E6%80%81%E7%BD%91%E7%AB%99/">Nginx主要应用 - 静态网站</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/06/19/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8/">Nginx主要应用</a></li><li class="post-list-item"><a class="post-list-link" href="/2020/06/18/Ngxin%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/">Ngxin配置文件</a></li></ul></div><div class="widget"><div class="widget-title"><i class="fa fa-external-link"> 友情链接</i></div><ul></ul><a href="https://github.com/Sean-inoubliable" title="--- GitHub of Sean ---" target="_blank">--- GitHub of Sean ---</a><ul></ul><a href="https://gitee.com/Sean-inoubliable" title="--- Gitee of Sean ---" target="_blank">--- Gitee of Sean ---</a></div></div></div><div class="pure-u-1 pure-u-md-3-4"><div id="footer">Copyright © 2020 <a href="/." rel="nofollow">Sean's Blog.</a> Powered by<a rel="nofollow" target="_blank" href="https://hexo.io"> Hexo.</a><a rel="nofollow" target="_blank" href="https://github.com/tufu9441/maupassant-hexo"> Theme</a> by<a rel="nofollow" target="_blank" href="https://github.com/pagecho"> Cho.</a></div></div></div><a class="show" id="rocket" href="#top"></a><script type="text/javascript" src="/js/totop.js?v=0.0.0" async></script><script type="text/javascript" src="//cdn.jsdelivr.net/gh/fancyapps/fancybox/dist/jquery.fancybox.min.js" async></script><script type="text/javascript" src="/js/fancybox.js?v=0.0.0" async></script><link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox/dist/jquery.fancybox.min.css"><script type="text/javascript" src="/js/copycode.js" successtext="复制成功!"></script><link rel="stylesheet" type="text/css" href="/css/copycode.css"><script type="text/javascript" src="/js/codeblock-resizer.js?v=0.0.0"></script><script type="text/javascript" src="/js/smartresize.js?v=0.0.0"></script></div></body></html>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;!--session过滤器--&gt;</span><br><span class="line">&lt;filter&gt;</span><br><span class="line">	&lt;filter-name&gt;springSessionRepositoryFilter&lt;&#x2F;filter-name&gt;</span><br><span class="line">	&lt;filter-class&gt;org.springframework.web.filter.DelegatingFilterProxy&lt;&#x2F;filter-class&gt;</span><br><span class="line">&lt;&#x2F;filter&gt;</span><br><span class="line">&lt;filter-mapping&gt;</span><br><span class="line">	&lt;filter-name&gt;springSessionRepositoryFilter&lt;&#x2F;filter-name&gt;</span><br><span class="line">	&lt;url-pattern&gt;&#x2F;*&lt;&#x2F;url-pattern&gt;</span><br><span class="line">&lt;&#x2F;filter-mapping&gt;</span><br><span class="line">&lt;!-- 完成这一步以后，我们对redis的集成就完成了。 --&gt;</span><br></pre></td></tr></table></figure>
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2020-08-26T02:09:57.935Z" itemprop="dateUpdated">2020-08-26 10:09:57</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/2020/08/20/Nginx-%E9%85%8D%E5%90%88Redis%E5%AF%B9%E6%89%80%E6%9C%89Tomcat%E5%81%9Asession%E5%85%B1%E4%BA%AB/" target="_blank" rel="external">http://www.some-note.cn/2020/08/20/Nginx-%E9%85%8D%E5%90%88Redis%E5%AF%B9%E6%89%80%E6%9C%89Tomcat%E5%81%9Asession%E5%85%B1%E4%BA%AB/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="http://www.some-note.cn">
+            <img src="/img/avatar.jpg" alt="Sean">
+            Sean
+        </a>
+    </footer>
+</blockquote>
+
+        
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Nginx/" rel="tag">Nginx</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Session/" rel="tag">Session</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://www.some-note.cn/2020/08/20/Nginx-%E9%85%8D%E5%90%88Redis%E5%AF%B9%E6%89%80%E6%9C%89Tomcat%E5%81%9Asession%E5%85%B1%E4%BA%AB/&title=《Nginx-配合Redis对所有Tomcat做session共享》 — Sean's Blog&pic=http://www.some-note.cn/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://www.some-note.cn/2020/08/20/Nginx-%E9%85%8D%E5%90%88Redis%E5%AF%B9%E6%89%80%E6%9C%89Tomcat%E5%81%9Asession%E5%85%B1%E4%BA%AB/&title=《Nginx-配合Redis对所有Tomcat做session共享》 — Sean's Blog&source=何必那么认真" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://www.some-note.cn/2020/08/20/Nginx-%E9%85%8D%E5%90%88Redis%E5%AF%B9%E6%89%80%E6%9C%89Tomcat%E5%81%9Asession%E5%85%B1%E4%BA%AB/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Nginx-配合Redis对所有Tomcat做session共享》 — Sean's Blog&url=http://www.some-note.cn/2020/08/20/Nginx-%E9%85%8D%E5%90%88Redis%E5%AF%B9%E6%89%80%E6%9C%89Tomcat%E5%81%9Asession%E5%85%B1%E4%BA%AB/&via=http://www.some-note.cn" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://www.some-note.cn/2020/08/20/Nginx-%E9%85%8D%E5%90%88Redis%E5%AF%B9%E6%89%80%E6%9C%89Tomcat%E5%81%9Asession%E5%85%B1%E4%BA%AB/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2020/08/20/Nginx%E7%95%AA%E5%A4%96-%E7%AE%80%E5%8D%95%E7%9A%84%E9%85%8D%E7%BD%AE%E8%AF%A6%E8%A7%A3/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Nginx番外-简单的配置详解</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <div class="reward-content">
+        
+        <div class="reward-code">
+            <img id="rewardCode" src="/img/wechat.jpg" alt="打赏二维码">
+        </div>
+        
+        <label class="reward-toggle">
+            <input id="rewardToggle" type="checkbox" class="reward-toggle-check"
+                data-wechat="/img/wechat.jpg" data-alipay="/img/alipay.jpg">
+            <div class="reward-toggle-ctrol">
+                <span class="reward-toggle-item wechat">微信</span>
+                <span class="reward-toggle-label"></span>
+                <span class="reward-toggle-item alipay">支付宝</span>
+            </div>
+        </label>
+        
+    </div>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Sean &copy; 2020</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://www.some-note.cn/2020/08/20/Nginx-%E9%85%8D%E5%90%88Redis%E5%AF%B9%E6%89%80%E6%9C%89Tomcat%E5%81%9Asession%E5%85%B1%E4%BA%AB/&title=《Nginx-配合Redis对所有Tomcat做session共享》 — Sean's Blog&pic=http://www.some-note.cn/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://www.some-note.cn/2020/08/20/Nginx-%E9%85%8D%E5%90%88Redis%E5%AF%B9%E6%89%80%E6%9C%89Tomcat%E5%81%9Asession%E5%85%B1%E4%BA%AB/&title=《Nginx-配合Redis对所有Tomcat做session共享》 — Sean's Blog&source=何必那么认真" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://www.some-note.cn/2020/08/20/Nginx-%E9%85%8D%E5%90%88Redis%E5%AF%B9%E6%89%80%E6%9C%89Tomcat%E5%81%9Asession%E5%85%B1%E4%BA%AB/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Nginx-配合Redis对所有Tomcat做session共享》 — Sean's Blog&url=http://www.some-note.cn/2020/08/20/Nginx-%E9%85%8D%E5%90%88Redis%E5%AF%B9%E6%89%80%E6%9C%89Tomcat%E5%81%9Asession%E5%85%B1%E4%BA%AB/&via=http://www.some-note.cn" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://www.some-note.cn/2020/08/20/Nginx-%E9%85%8D%E5%90%88Redis%E5%AF%B9%E6%89%80%E6%9C%89Tomcat%E5%81%9Asession%E5%85%B1%E4%BA%AB/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=http://www.some-note.cn/2020/08/20/Nginx-%E9%85%8D%E5%90%88Redis%E5%AF%B9%E6%89%80%E6%9C%89Tomcat%E5%81%9Asession%E5%85%B1%E4%BA%AB/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>

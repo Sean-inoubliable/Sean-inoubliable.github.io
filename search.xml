@@ -45,11 +45,49 @@
 <li>充分利用其各自优势, 从而达到更高效合理的架构</li>
 </ul>
 </blockquote>
-<h2 id="动静分离示例图"><a href="#动静分离示例图" class="headerlink" title="动静分离示例图"></a>动静分离示例图</h2><p><img src="/images/Nginx%E5%8A%A8%E9%9D%99%E5%88%86%E7%A6%BB%E7%AE%80%E6%98%93%E5%9B%BE.png" alt=""></p>
+<h2 id="动静分离示例图"><a href="#动静分离示例图" class="headerlink" title="动静分离示例图"></a>动静分离示例图</h2><figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/images/Nginx动静分离简易图.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+
 <blockquote>
 <ul>
 <li>Nginx 在一台 Linux 上安装一份, 可以启动多 , 每个 Nginx 的配置文件不一样即可</li>
 </ul>
+</blockquote>
+]]></content>
+      <categories>
+        <category>Nginx</category>
+      </categories>
+  </entry>
+  <entry>
+    <title>Nginx主要应用 - 虚拟主机</title>
+    <url>/2020/07/16/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E8%99%9A%E6%8B%9F%E4%B8%BB%E6%9C%BA/</url>
+    <content><![CDATA[<blockquote>
+<ul>
+<li>虚拟主机，就是把一台物理服务器划分成多个‘虚拟’的服务器，这样一台物理服务器就可以当作多个服务器来使用，从而可以配置多个网站</li>
+<li>Nginx 提供虚拟主机的功能，就是为了让我们无需安装多个 Nginx, 就可以运行多个网站</li>
+<li>Nginx 下，一个 server 标签就是一个虚拟主机</li>
+<li>Nginx 的虚拟主机就是通过 nginx.conf 中 server 节点指定的，要想设置多个虚拟主机，配置多个 server 节点即可</li>
+</ul>
+</blockquote>
+<h2 id="配置虚拟主机，通常有一下两种方式"><a href="#配置虚拟主机，通常有一下两种方式" class="headerlink" title="配置虚拟主机，通常有一下两种方式"></a>配置虚拟主机，通常有一下两种方式</h2><h3 id="1-基于端口的虚拟主机"><a href="#1-基于端口的虚拟主机" class="headerlink" title="1. 基于端口的虚拟主机"></a>1. 基于端口的虚拟主机</h3><ul>
+<li>使用端口号来做区分，server 节点中的 listen</li>
+</ul>
+<h3 id="2-基于域名的虚拟主机"><a href="#2-基于域名的虚拟主机" class="headerlink" title="2. 基于域名的虚拟主机"></a>2. 基于域名的虚拟主机</h3><ul>
+<li>使用域名来做区分， server 节点中的 server_name</li>
+</ul>
+<hr>
+<blockquote>
+<p>自定义域名，使用时，需修改 <strong>hosts文件配置</strong></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 例如</span><br><span class="line">192.168.208.128 www.sean.com</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>文件位置 ： C:\windows\System32\driver\etc\hosts</p>
 </blockquote>
 ]]></content>
       <categories>
@@ -76,7 +114,15 @@
 <p>通过在 Nginx 的 nginx.conf 文件进行 <strong>配置</strong> 即可实现</p>
 </blockquote>
 <ul>
-<li>下为Nginx负载简易图<br><img src="/images/Nginx%E8%B4%9F%E8%BD%BD%E7%AE%80%E6%98%93%E5%9B%BE.png" alt=""></li>
+<li>下为Nginx负载简易图<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/images/Nginx负载简易图.png" alt="" title="">
+                </div>
+                <div class="image-caption"></div>
+            </figure>
+
+</li>
 </ul>
 <h3 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h3><h4 id="1-在-http-模块添加-例"><a href="#1-在-http-模块添加-例" class="headerlink" title="1. 在 http 模块添加 ( 例 )"></a>1. 在 http 模块添加 ( 例 )</h4><figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># upstream 的名字, 一般定为域名</span><br><span class="line">upstream www.sean.com &#123; </span><br><span class="line">#对应 Tomcat 的 IP &amp; Port</span><br><span class="line">    server 127.0.0.1:9100 weight&#x3D;3; </span><br><span class="line">#有几个 Tomcat, 就配几个 server</span><br><span class="line">    server 127.0.0.1:9200 weight&#x3D;1; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <blockquote>
@@ -131,51 +177,6 @@
       </tags>
   </entry>
   <entry>
-    <title>Nginx主要应用 - 虚拟主机</title>
-    <url>/2020/07/16/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E8%99%9A%E6%8B%9F%E4%B8%BB%E6%9C%BA/</url>
-    <content><![CDATA[<blockquote>
-<ul>
-<li>虚拟主机，就是把一台物理服务器划分成多个‘虚拟’的服务器，这样一台物理服务器就可以当作多个服务器来使用，从而可以配置多个网站</li>
-<li>Nginx 提供虚拟主机的功能，就是为了让我们无需安装多个 Nginx, 就可以运行多个网站</li>
-<li>Nginx 下，一个 server 标签就是一个虚拟主机</li>
-<li>Nginx 的虚拟主机就是通过 nginx.conf 中 server 节点指定的，要想设置多个虚拟主机，配置多个 server 节点即可</li>
-</ul>
-</blockquote>
-<h2 id="配置虚拟主机，通常有一下两种方式"><a href="#配置虚拟主机，通常有一下两种方式" class="headerlink" title="配置虚拟主机，通常有一下两种方式"></a>配置虚拟主机，通常有一下两种方式</h2><h3 id="1-基于端口的虚拟主机"><a href="#1-基于端口的虚拟主机" class="headerlink" title="1. 基于端口的虚拟主机"></a>1. 基于端口的虚拟主机</h3><ul>
-<li>使用端口号来做区分，server 节点中的 listen</li>
-</ul>
-<h3 id="2-基于域名的虚拟主机"><a href="#2-基于域名的虚拟主机" class="headerlink" title="2. 基于域名的虚拟主机"></a>2. 基于域名的虚拟主机</h3><ul>
-<li>使用域名来做区分， server 节点中的 server_name</li>
-</ul>
-<hr>
-<blockquote>
-<p>自定义域名，使用时，需修改 <strong>hosts文件配置</strong></p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># 例如</span><br><span class="line">192.168.208.128 www.sean.com</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>文件位置 ： C:\windows\System32\driver\etc\hosts</p>
-</blockquote>
-]]></content>
-      <categories>
-        <category>Nginx</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>Nginx主要应用 - 静态网站</title>
-    <url>/2020/06/22/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E9%9D%99%E6%80%81%E7%BD%91%E7%AB%99/</url>
-    <content><![CDATA[<blockquote>
-<p>Nginx 是一个 HTTP 的 Web 服务器, 可以将服务器上的静态文件 (如html / img等) 通过 HTTP 协议返回给浏览器客户端</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># IP + Port &#x3D; root</span><br><span class="line">server &#123;</span><br><span class="line">    listen 80; # 端口号</span><br><span class="line">    location &#x2F; &#123;</span><br><span class="line">        root &#x2F;opt&#x2F;www&#x2F;; # 静态文件路径</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
-      <categories>
-        <category>Nginx</category>
-      </categories>
-      <tags>
-        <tag>静态网站</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Nginx主要应用 - 静态代理</title>
     <url>/2020/06/30/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E9%9D%99%E6%80%81%E4%BB%A3%E7%90%86/</url>
     <content><![CDATA[<ul>
@@ -216,6 +217,24 @@
       </tags>
   </entry>
   <entry>
+    <title>Nginx主要应用</title>
+    <url>/2020/06/19/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8/</url>
+    <content><![CDATA[<blockquote>
+<p>主要是应用配置文件来实现</p>
+</blockquote>
+<ul>
+<li>静态网站</li>
+<li>负载均衡</li>
+<li>静态代理</li>
+<li>动静分离</li>
+<li>虚拟主机</li>
+</ul>
+]]></content>
+      <categories>
+        <category>Nginx</category>
+      </categories>
+  </entry>
+  <entry>
     <title>Nginx开篇简介</title>
     <url>/2020/06/16/Nginx%E5%BC%80%E7%AF%87%E7%AE%80%E4%BB%8B/</url>
     <content><![CDATA[<blockquote>
@@ -242,7 +261,14 @@
 <li>免费开源 / 同时其商业版本提供性能优化, 宕机等紧急问题处理等技术支持和服务</li>
 </ol>
 <h2 id="Nginx反向代理-Reverse-Proxy"><a href="#Nginx反向代理-Reverse-Proxy" class="headerlink" title="Nginx反向代理 (Reverse Proxy)"></a>Nginx反向代理 (Reverse Proxy)</h2><blockquote>
-<p>以反向代理服务器来接收 Internet 上的链接请求, 然后将请求转发给内部网络上的服务器, 并将从服务器上得到的结果返回给 Internet 上请求链接的客户端, 此时代理服务器对外表现为一个<strong><em>反向代理服务器</em></strong><br><img src="/images/Nginx%E5%8F%8D%E5%90%91%E4%BB%A3%E7%90%86.png" alt="alt"></p>
+<p>以反向代理服务器来接收 Internet 上的链接请求, 然后将请求转发给内部网络上的服务器, 并将从服务器上得到的结果返回给 Internet 上请求链接的客户端, 此时代理服务器对外表现为一个<strong><em>反向代理服务器</em></strong></p>
+<figure class="image-bubble">
+                <div class="img-lightbox">
+                    <div class="overlay"></div>
+                    <img src="/images/Nginx反向代理.png" alt="alt" title="">
+                </div>
+                <div class="image-caption">alt</div>
+            </figure>
 </blockquote>
 <h2 id="正向代理"><a href="#正向代理" class="headerlink" title="正向代理"></a>正向代理</h2><blockquote>
 <p>类似一个跳板机, ‘代理访问外部资源’, 通过访问代理服务器, 获取无法访问网站的内容</p>
@@ -346,6 +372,42 @@
       </tags>
   </entry>
   <entry>
+    <title>Nginx主要应用 - 静态网站</title>
+    <url>/2020/06/22/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8-%E9%9D%99%E6%80%81%E7%BD%91%E7%AB%99/</url>
+    <content><![CDATA[<blockquote>
+<p>Nginx 是一个 HTTP 的 Web 服务器, 可以将服务器上的静态文件 (如html / img等) 通过 HTTP 协议返回给浏览器客户端</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line"># IP + Port &#x3D; root</span><br><span class="line">server &#123;</span><br><span class="line">    listen 80; # 端口号</span><br><span class="line">    location &#x2F; &#123;</span><br><span class="line">        root &#x2F;opt&#x2F;www&#x2F;; # 静态文件路径</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+      <categories>
+        <category>Nginx</category>
+      </categories>
+      <tags>
+        <tag>静态网站</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Ngxin配置文件</title>
+    <url>/2020/06/18/Ngxin%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/</url>
+    <content><![CDATA[<blockquote>
+<p>学习 <strong>Nginx</strong>, 首先需要对它的核心配置文件 nginx.conf 有一定认识</p>
+</blockquote>
+<blockquote>
+<p>Nginx 的核心配置文件主要由三个部分构成</p>
+</blockquote>
+<p><strong><em>基本配置</em></strong> / <strong><em>events配置</em></strong> / <strong><em>http配置( 基本配置 / 多个server配置 )</em></strong></p>
+<ul>
+<li>看下图</li>
+</ul>
+<p>  <img src="/images/nginx%E9%85%8D%E7%BD%AE%E4%B8%AD%E6%96%87%E8%AF%A6%E8%A7%A3.png" alt=""></p>
+]]></content>
+      <categories>
+        <category>Nginx</category>
+      </categories>
+      <tags>
+        <tag>配置</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>Nginx日志管理 &amp; 日志自动备份</title>
     <url>/2020/08/03/Nginx%E6%97%A5%E5%BF%97%E7%AE%A1%E7%90%86-%E6%97%A5%E5%BF%97%E8%87%AA%E5%8A%A8%E5%A4%87%E4%BB%BD/</url>
     <content><![CDATA[<ul>
@@ -443,42 +505,14 @@
       </tags>
   </entry>
   <entry>
-    <title>Nginx主要应用</title>
-    <url>/2020/06/19/Nginx%E4%B8%BB%E8%A6%81%E5%BA%94%E7%94%A8/</url>
-    <content><![CDATA[<blockquote>
-<p>主要是应用配置文件来实现</p>
-</blockquote>
-<ul>
-<li>静态网站</li>
-<li>负载均衡</li>
-<li>静态代理</li>
-<li>动静分离</li>
-<li>虚拟主机</li>
-</ul>
-]]></content>
-      <categories>
-        <category>Nginx</category>
-      </categories>
-  </entry>
-  <entry>
-    <title>Ngxin配置文件</title>
-    <url>/2020/06/18/Ngxin%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6/</url>
-    <content><![CDATA[<blockquote>
-<p>学习 <strong>Nginx</strong>, 首先需要对它的核心配置文件 nginx.conf 有一定认识</p>
-</blockquote>
-<blockquote>
-<p>Nginx 的核心配置文件主要由三个部分构成</p>
-</blockquote>
-<p><strong><em>基本配置</em></strong> / <strong><em>events配置</em></strong> / <strong><em>http配置( 基本配置 / 多个server配置 )</em></strong></p>
-<ul>
-<li>看下图</li>
-</ul>
-<p>  <img src="/images/nginx%E9%85%8D%E7%BD%AE%E4%B8%AD%E6%96%87%E8%AF%A6%E8%A7%A3.png" alt=""></p>
-]]></content>
+    <title>Nginx番外-简单的配置详解</title>
+    <url>/2020/08/20/Nginx%E7%95%AA%E5%A4%96-%E7%AE%80%E5%8D%95%E7%9A%84%E9%85%8D%E7%BD%AE%E8%AF%A6%E8%A7%A3/</url>
+    <content><![CDATA[<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#开启进程数 &lt;&#x3D;CPU数 </span><br><span class="line">worker_processes  1;</span><br><span class="line">#自定义错误日志保存位置，全局设置，默认logs&#x2F;error.log</span><br><span class="line">#error_log  logs&#x2F;error.log;</span><br><span class="line">#每个进程最大连接数（最大连接&#x3D;连接数x进程数）每个worker允许同时产生多少个链接，默认1024</span><br><span class="line">events &#123;</span><br><span class="line">    worker_connections  1024;</span><br><span class="line">&#125;</span><br><span class="line">#</span><br><span class="line">http &#123;</span><br><span class="line">    #文件扩展名与文件类型映射表</span><br><span class="line">    include       mime.types;</span><br><span class="line">    #默认文件类型</span><br><span class="line">    default_type  application&#x2F;octet-stream;</span><br><span class="line">    #自定义日志文件输出格式 全局设置</span><br><span class="line">    log_format  main  &#39;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &#39;</span><br><span class="line">              &#39;$status $body_bytes_sent &quot;$http_referer&quot; &#39;</span><br><span class="line">              &#39;&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;&#39;;</span><br><span class="line">    #自定义全局请求日志保存位置，全局设置，默认logs&#x2F;access.log， 定义格式：文件存储位置 + 日志输出格式</span><br><span class="line">    #access_log  logs&#x2F;access.log  main;</span><br><span class="line">    #打开发送文件</span><br><span class="line">    sendfile        on;</span><br><span class="line">    #连接超时时间</span><br><span class="line">    #keepalive_timeout  0;</span><br><span class="line">    keepalive_timeout  65;</span><br><span class="line">    #打开gzip压缩</span><br><span class="line">    #gzip  on;</span><br><span class="line">    #配置虚拟主机，基于域名、ip和端口，可以配置多个server</span><br><span class="line">    server &#123;</span><br><span class="line">        #监听端口，可以是ip:port 或者 port</span><br><span class="line">        listen       80;</span><br><span class="line">        #监听域名,可以是ip或者域名，server_name有三种匹配方式：精准匹配（www.domain.com）、通配符匹配（*.domain.com 、www.*）、正则表达式匹配（~^(?.+)\.domain\.com$）</span><br><span class="line">        server_name  localhost;</span><br><span class="line">        #自定义请求日志，局部，当前server有效</span><br><span class="line">        #access_log  logs&#x2F;host.access.log  main;</span><br><span class="line">        #错误页面及其返回地址</span><br><span class="line">        error_page   500 502 503 504  &#x2F;50x.html;</span><br><span class="line">        #请求匹配，同样有精准（&#x3D; &#x2F;index.html）、模糊（~ index）、正则，允许配置多个location</span><br><span class="line">        location &#x2F; &#123;</span><br><span class="line">            #返回根路径地址（相对路径:相对于&#x2F;usr&#x2F;local&#x2F;nginx&#x2F;）</span><br><span class="line">            root   html;</span><br><span class="line">            #默认主页</span><br><span class="line">            index  index.html index.htm;</span><br><span class="line">        &#125;</span><br><span class="line">        #</span><br><span class="line">        location &#x2F;html &#123;</span><br><span class="line">            root   html;</span><br><span class="line">            index  index.html index.htm;</span><br><span class="line">        &#125;</span><br><span class="line">        #</span><br><span class="line">    &#125;</span><br><span class="line">    #</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
       <categories>
         <category>Nginx</category>
       </categories>
       <tags>
+        <tag>Nginx</tag>
         <tag>配置</tag>
       </tags>
   </entry>
@@ -499,17 +533,5 @@
 
 <p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p>
 ]]></content>
-  </entry>
-  <entry>
-    <title>Nginx番外-简单的配置详解</title>
-    <url>/2020/08/20/Nginx%E7%95%AA%E5%A4%96-%E7%AE%80%E5%8D%95%E7%9A%84%E9%85%8D%E7%BD%AE%E8%AF%A6%E8%A7%A3/</url>
-    <content><![CDATA[<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">#开启进程数 &lt;&#x3D;CPU数 </span><br><span class="line">worker_processes  1;</span><br><span class="line">#自定义错误日志保存位置，全局设置，默认logs&#x2F;error.log</span><br><span class="line">#error_log  logs&#x2F;error.log;</span><br><span class="line">#每个进程最大连接数（最大连接&#x3D;连接数x进程数）每个worker允许同时产生多少个链接，默认1024</span><br><span class="line">events &#123;</span><br><span class="line">    worker_connections  1024;</span><br><span class="line">&#125;</span><br><span class="line">#</span><br><span class="line">http &#123;</span><br><span class="line">    #文件扩展名与文件类型映射表</span><br><span class="line">    include       mime.types;</span><br><span class="line">    #默认文件类型</span><br><span class="line">    default_type  application&#x2F;octet-stream;</span><br><span class="line">    #自定义日志文件输出格式 全局设置</span><br><span class="line">    log_format  main  &#39;$remote_addr - $remote_user [$time_local] &quot;$request&quot; &#39;</span><br><span class="line">              &#39;$status $body_bytes_sent &quot;$http_referer&quot; &#39;</span><br><span class="line">              &#39;&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;&#39;;</span><br><span class="line">    #自定义全局请求日志保存位置，全局设置，默认logs&#x2F;access.log， 定义格式：文件存储位置 + 日志输出格式</span><br><span class="line">    #access_log  logs&#x2F;access.log  main;</span><br><span class="line">    #打开发送文件</span><br><span class="line">    sendfile        on;</span><br><span class="line">    #连接超时时间</span><br><span class="line">    #keepalive_timeout  0;</span><br><span class="line">    keepalive_timeout  65;</span><br><span class="line">    #打开gzip压缩</span><br><span class="line">    #gzip  on;</span><br><span class="line">    #配置虚拟主机，基于域名、ip和端口，可以配置多个server</span><br><span class="line">    server &#123;</span><br><span class="line">        #监听端口，可以是ip:port 或者 port</span><br><span class="line">        listen       80;</span><br><span class="line">        #监听域名,可以是ip或者域名，server_name有三种匹配方式：精准匹配（www.domain.com）、通配符匹配（*.domain.com 、www.*）、正则表达式匹配（~^(?.+)\.domain\.com$）</span><br><span class="line">        server_name  localhost;</span><br><span class="line">        #自定义请求日志，局部，当前server有效</span><br><span class="line">        #access_log  logs&#x2F;host.access.log  main;</span><br><span class="line">        #错误页面及其返回地址</span><br><span class="line">        error_page   500 502 503 504  &#x2F;50x.html;</span><br><span class="line">        #请求匹配，同样有精准（&#x3D; &#x2F;index.html）、模糊（~ index）、正则，允许配置多个location</span><br><span class="line">        location &#x2F; &#123;</span><br><span class="line">            #返回根路径地址（相对路径:相对于&#x2F;usr&#x2F;local&#x2F;nginx&#x2F;）</span><br><span class="line">            root   html;</span><br><span class="line">            #默认主页</span><br><span class="line">            index  index.html index.htm;</span><br><span class="line">        &#125;</span><br><span class="line">        #</span><br><span class="line">        location &#x2F;html &#123;</span><br><span class="line">            root   html;</span><br><span class="line">            index  index.html index.htm;</span><br><span class="line">        &#125;</span><br><span class="line">        #</span><br><span class="line">    &#125;</span><br><span class="line">    #</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
-      <categories>
-        <category>Nginx</category>
-      </categories>
-      <tags>
-        <tag>Nginx</tag>
-        <tag>配置</tag>
-      </tags>
   </entry>
 </search>
