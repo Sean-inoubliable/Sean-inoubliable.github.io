@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+    
+
+    
+
+
+
+    <meta charset="utf-8">
+    
+    
+    
+    
+    <title>Java序列化与反序列化 | Sean&#39;s Blog | why so serious ?</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    <meta name="theme-color" content="#3F51B5">
+    
+    
+    <meta name="keywords" content="序列化">
+    <meta name="description" content="Java序列化与反序列化 序列化只针对 ‘ 堆 ’ 数据，一般情况下无视 static 与 transient，当然还存在极个别情况的序列化操作。 以下内容会对序列化操作做出简单介绍。  内容结构 序列化简介 代码片段示例 序列化的几种方式 序列化ID 敏感字段加密 Transient关键字  序列化简介Java序列化：将 Java 对象的 状态 序列化为字节序列的二进制数据文件。 是处理对象流的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java序列化与反序列化">
+<meta property="og:url" content="http://www.some-note.cn/2020/08/27/Java%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/index.html">
+<meta property="og:site_name" content="Sean&#39;s Blog">
+<meta property="og:description" content="Java序列化与反序列化 序列化只针对 ‘ 堆 ’ 数据，一般情况下无视 static 与 transient，当然还存在极个别情况的序列化操作。 以下内容会对序列化操作做出简单介绍。  内容结构 序列化简介 代码片段示例 序列化的几种方式 序列化ID 敏感字段加密 Transient关键字  序列化简介Java序列化：将 Java 对象的 状态 序列化为字节序列的二进制数据文件。 是处理对象流的">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-08-27T07:17:20.000Z">
+<meta property="article:modified_time" content="2020-08-27T07:18:09.219Z">
+<meta property="article:author" content="Sean">
+<meta property="article:tag" content="序列化">
+<meta name="twitter:card" content="summary">
+    
+        <link rel="alternate" type="application/atom+xml" title="Sean&#39;s Blog" href="/atom.xml">
+    
+    <link rel="shortcut icon" href="/favicon.ico">
+    <link rel="stylesheet" href="//unpkg.com/hexo-theme-material-indigo@latest/css/style.css">
+    <script>window.lazyScripts=[]</script>
+
+    <!-- custom head -->
+    
+
+<meta name="generator" content="Hexo 4.2.1"></head>
+
+<body>
+    <div id="loading" class="active"></div>
+
+    <aside id="menu" class="hide" >
+  <div class="inner flex-row-vertical">
+    <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menu-off">
+        <i class="icon icon-lg icon-close"></i>
+    </a>
+    <div class="brand-wrap" style="background-image:url(/img/brand.jpg)">
+      <div class="brand">
+        <a href="/" class="avatar waves-effect waves-circle waves-light">
+          <img src="/img/avatar.jpg">
+        </a>
+        <hgroup class="introduce">
+          <h5 class="nickname">Sean</h5>
+          <a href="mailto:inoubliable_s@163.com" title="inoubliable_s@163.com" class="mail">inoubliable_s@163.com</a>
+        </hgroup>
+      </div>
+    </div>
+    <div class="scroll-wrap flex-col">
+      <ul class="nav">
+        
+            <li class="waves-block waves-effect">
+              <a href="/"  >
+                <i class="icon icon-lg icon-home"></i>
+                主页
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/archives"  >
+                <i class="icon icon-lg icon-archives"></i>
+                归档
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/tags"  >
+                <i class="icon icon-lg icon-tags"></i>
+                标签
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="/categories"  >
+                <i class="icon icon-lg icon-th-list"></i>
+                分类
+              </a>
+            </li>
+        
+            <li class="waves-block waves-effect">
+              <a href="https://github.com/Sean-inoubliable" target="_blank" >
+                <i class="icon icon-lg icon-github"></i>
+                Github
+              </a>
+            </li>
+        
+      </ul>
+    </div>
+  </div>
+</aside>
+
+    <main id="main">
+        <header class="top-header" id="header">
+    <div class="flex-row">
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light on" id="menu-toggle">
+          <i class="icon icon-lg icon-navicon"></i>
+        </a>
+        <div class="flex-col header-title ellipsis">Java序列化与反序列化</div>
+        
+        <div class="search-wrap" id="search-wrap">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="back">
+                <i class="icon icon-lg icon-chevron-left"></i>
+            </a>
+            <input type="text" id="key" class="search-input" autocomplete="off" placeholder="输入感兴趣的关键字">
+            <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="search">
+                <i class="icon icon-lg icon-search"></i>
+            </a>
+        </div>
+        
+        
+        <a href="javascript:;" class="header-icon waves-effect waves-circle waves-light" id="menuShare">
+            <i class="icon icon-lg icon-share-alt"></i>
+        </a>
+        
+    </div>
+</header>
+<header class="content-header post-header">
+
+    <div class="container fade-scale">
+        <h1 class="title">Java序列化与反序列化</h1>
+        <h5 class="subtitle">
+            
+                <time datetime="2020-08-27T07:17:20.000Z" itemprop="datePublished" class="page-time">
+  2020-08-27
+</time>
+
+
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E5%BA%8F%E5%88%97%E5%8C%96/">序列化</a></li></ul>
+
+            
+        </h5>
+    </div>
+
+    
+
+
+</header>
+
+
+<div class="container body-wrap">
+    
+    <aside class="post-widget">
+        <nav class="post-toc-wrap post-toc-shrink" id="post-toc">
+            <h4>TOC</h4>
+            <ol class="post-toc"><li class="post-toc-item post-toc-level-1"><a class="post-toc-link" href="#Java序列化与反序列化"><span class="post-toc-number">1.</span> <span class="post-toc-text">Java序列化与反序列化</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#内容结构"><span class="post-toc-number">1.1.</span> <span class="post-toc-text">内容结构</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#序列化简介"><span class="post-toc-number">1.2.</span> <span class="post-toc-text">序列化简介</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#代码片段示例"><span class="post-toc-number">1.3.</span> <span class="post-toc-text">代码片段示例</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#序列化的几种方式"><span class="post-toc-number">1.4.</span> <span class="post-toc-text">序列化的几种方式</span></a><ol class="post-toc-child"><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#方式一（隐式序列化）："><span class="post-toc-number">1.4.1.</span> <span class="post-toc-text">方式一（隐式序列化）：</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#方式二（显式序列化）："><span class="post-toc-number">1.4.2.</span> <span class="post-toc-text">方式二（显式序列化）：</span></a></li><li class="post-toc-item post-toc-level-3"><a class="post-toc-link" href="#方式三（显-隐式序列化）："><span class="post-toc-number">1.4.3.</span> <span class="post-toc-text">方式三（显+隐式序列化）：</span></a></li></ol></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#序列化ID"><span class="post-toc-number">1.5.</span> <span class="post-toc-text">序列化ID</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#敏感字段加密"><span class="post-toc-number">1.6.</span> <span class="post-toc-text">敏感字段加密</span></a></li><li class="post-toc-item post-toc-level-2"><a class="post-toc-link" href="#Transient-关键字"><span class="post-toc-number">1.7.</span> <span class="post-toc-text">Transient 关键字</span></a></li></ol></li></ol>
+        </nav>
+    </aside>
+
+
+<article id="post-Java序列化与反序列化"
+  class="post-article article-type-post fade" itemprop="blogPost">
+
+    <div class="post-card">
+        <h1 class="post-card-title">Java序列化与反序列化</h1>
+        <div class="post-meta">
+            <time class="post-time" title="2020-08-27 15:17:20" datetime="2020-08-27T07:17:20.000Z"  itemprop="datePublished">2020-08-27</time>
+
+            
+	<ul class="article-category-list"><li class="article-category-list-item"><a class="article-category-list-link" href="/categories/%E5%BA%8F%E5%88%97%E5%8C%96/">序列化</a></li></ul>
+
+
+
+            
+<span id="busuanzi_container_page_pv" title="文章总阅读量" style='display:none'>
+    <i class="icon icon-eye icon-pr"></i><span id="busuanzi_value_page_pv"></span>
+</span>
+
+
+        </div>
+        <div class="post-content" id="post-content" itemprop="postContent">
+            <h1 id="Java序列化与反序列化"><a href="#Java序列化与反序列化" class="headerlink" title="Java序列化与反序列化"></a>Java序列化与反序列化</h1><blockquote>
+<p>序列化只针对 ‘ 堆 ’ 数据，一般情况下无视 static 与 transient，当然还存在极个别情况的序列化操作。</p>
+<p>以下内容会对序列化操作做出简单介绍。</p>
+</blockquote>
+<h2 id="内容结构"><a href="#内容结构" class="headerlink" title="内容结构"></a>内容结构</h2><ul>
+<li>序列化简介</li>
+<li>代码片段示例</li>
+<li>序列化的几种方式</li>
+<li>序列化ID</li>
+<li>敏感字段加密</li>
+<li>Transient关键字</li>
+</ul>
+<h2 id="序列化简介"><a href="#序列化简介" class="headerlink" title="序列化简介"></a>序列化简介</h2><p>Java序列化：将 Java 对象的 <strong>状态</strong> 序列化为字节序列的二进制数据文件。</p>
+<p>是处理对象流的一种机制，即可以方便的保存内存中 Java 对象的状态，同时也方便传输。</p>
+<p>特点：速度快、安全、方便传输、方便存储（文件、数据、磁盘）。</p>
+<p>优点：可实现对象的 ‘ 持久性 ’ ，所谓持久性就是指对象的生命周期不取决于程序。</p>
+<h2 id="代码片段示例"><a href="#代码片段示例" class="headerlink" title="代码片段示例"></a>代码片段示例</h2><blockquote>
+<p>序列化示例</p>
+<blockquote>
+<p> Java对象的状态 &lt;-&gt; 二进制文件转换</p>
+</blockquote>
+<blockquote>
+<p> Java对象的状态 &lt;-&gt; 序列化输出流</p>
+</blockquote>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 示例 pojo 类 */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span> <span class="keyword">implements</span> <span class="title">Serializable</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">    <span class="keyword">private</span> String sex;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> age;</span><br><span class="line">    <span class="comment">/* 省略 get()、set()、toString() 方法 */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 测试类 */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestMain</span> </span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/* 测试 Main 方法 */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span> <span class="params">(String[] agrs)</span> <span class="keyword">throws</span> IOException, ClassNotFoundException </span>&#123;</span><br><span class="line">        serializeToFile();</span><br><span class="line">        <span class="comment">// serializeToStream();</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 序列化、反序列化 </span></span><br><span class="line"><span class="comment">     * eg: Java对象的状态 &lt;-&gt; 二进制文件转换 </span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">serializeToFile</span><span class="params">()</span> <span class="keyword">throws</span> IOException, ClassNotFoundException </span>&#123;</span><br><span class="line">        <span class="comment">/* 文件存放位置 */</span></span><br><span class="line">        String filePath = <span class="string">"E:/Person.txt"</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">/* 序列化，将Java对象的状态序列化为字节序列的二进制数据写入文件（存入磁盘） */</span></span><br><span class="line">        <span class="comment">// 创建可序列化对象</span></span><br><span class="line">        Person personOutput = <span class="keyword">new</span> Person();</span><br><span class="line">        personOutput.setName(<span class="string">"sean"</span>);</span><br><span class="line">        personOutput.setAge(<span class="number">26</span>);</span><br><span class="line">        personOutput.setSex(<span class="string">"男"</span>);</span><br><span class="line">        <span class="comment">// 创建序列化二进制文件输出流</span></span><br><span class="line">        ObjectOutputStream oos = <span class="keyword">new</span> ObjectOutputStream(<span class="keyword">new</span> FileOutputStream(<span class="keyword">new</span> File(filePath)));</span><br><span class="line">        <span class="comment">// 将序列化对象存入文件</span></span><br><span class="line">        oos.writeObject(personOutput);</span><br><span class="line">        oos.close();</span><br><span class="line">        </span><br><span class="line">        <span class="comment">/* 反序列化，将字节序列的二进制数据文件读取反序列化为Java对象 */</span></span><br><span class="line">        ObjectInputStream ois = <span class="keyword">new</span> ObjectInputStream(<span class="keyword">new</span> FileInputStream(<span class="keyword">new</span> File(filePath)));</span><br><span class="line">        Person personInput = (Person) ois.readObject();</span><br><span class="line">        System.out.println(personInput);</span><br><span class="line">        ois.close();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 序列化、反序列化</span></span><br><span class="line"><span class="comment">     * eg: Java对象的状态 &lt;-&gt; 序列化输出流</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">serializeToStream</span> <span class="params">()</span> <span class="keyword">throws</span> IOException, ClassNotFoundException </span>&#123;</span><br><span class="line">        <span class="comment">/* 序列化，将Java对象的状态序列化为字节序列的输出流存入缓冲区 */</span></span><br><span class="line">        <span class="comment">// 创建可序列化对象</span></span><br><span class="line">        Person personOutput = <span class="keyword">new</span> Person();</span><br><span class="line">        personOutput.setName(<span class="string">"sean"</span>);</span><br><span class="line">        personOutput.setAge(<span class="number">26</span>);</span><br><span class="line">        personOutput.setSex(<span class="string">"男"</span>);</span><br><span class="line">        <span class="comment">// 创建序列化输出流</span></span><br><span class="line">        ByteArrayOutputStream bos = <span class="keyword">new</span> ByteArrayOutputStream();</span><br><span class="line">        ObjectOutputStream oos = <span class="keyword">new</span> ObjectOutputStream(bos);</span><br><span class="line">        <span class="comment">// 将序列化对象存入缓冲区</span></span><br><span class="line">        oos.writeObject(personOutput);</span><br><span class="line">        oos.close();</span><br><span class="line">        </span><br><span class="line">        <span class="comment">/* 反序列化，从缓冲区取回被序列化的对象 */</span></span><br><span class="line">        ObjectInputStream ois = <span class="keyword">new</span> ObjectInputStream(<span class="keyword">new</span> ByteArrayInputStream(bos.toByteArray()));</span><br><span class="line">        Person personInput = (Person) Inputois.readObject();</span><br><span class="line">        ois.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="序列化的几种方式"><a href="#序列化的几种方式" class="headerlink" title="序列化的几种方式"></a>序列化的几种方式</h2><h3 id="方式一（隐式序列化）："><a href="#方式一（隐式序列化）：" class="headerlink" title="方式一（隐式序列化）："></a>方式一（隐式序列化）：</h3><blockquote>
+<p>实现 <strong>Serializable</strong> 接口，隐式序列化 无需手动序列化。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 示例 pojo 类 */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span> <span class="keyword">implements</span> <span class="title">Serializable</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">    <span class="keyword">private</span> String sex;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> age;</span><br><span class="line">    <span class="comment">/* 省略 get()、set()、toString() 方法 */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="方式二（显式序列化）："><a href="#方式二（显式序列化）：" class="headerlink" title="方式二（显式序列化）："></a>方式二（显式序列化）：</h3><blockquote>
+<p>实现 <strong>Externalizable</strong> 接口，显式序列化 需要手动序列化。</p>
+<p>继承自 Serializable 接口。</p>
+<p>实现此接口，必须实现其 writeExternal() 和 readExternal() 方法来进行自定义的手动序列化。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 示例 pojo 类 */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span> <span class="keyword">implements</span> <span class="title">Externalizable</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">    <span class="keyword">private</span> String sex;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> age;</span><br><span class="line">    <span class="comment">/* 省略 set()、get()、toString() 方法 */</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 自定义序列化</span></span><br><span class="line"><span class="comment">     * 可在其中操作字段数据。</span></span><br><span class="line"><span class="comment">     * 如：加密、脱敏等操作。</span></span><br><span class="line"><span class="comment">     * 隐私数据可添加修饰符 transient，使其避免序列化（几种方式通用）。</span></span><br><span class="line"><span class="comment">     * 若要传输 transient 修饰符修饰的字段数据，可将其在自定义序列化中手动赋值。</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">writeExternal</span><span class="params">(ObjectOutput out)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        out.writeObject(name);</span><br><span class="line">        out.writeObject(sex);</span><br><span class="line">        out.write(age);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">readExternal</span><span class="params">(ObjectInput in)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        name = in.readObject.toString();</span><br><span class="line">        sex = in.readObject.toString();</span><br><span class="line">        age = in.read();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="方式三（显-隐式序列化）："><a href="#方式三（显-隐式序列化）：" class="headerlink" title="方式三（显+隐式序列化）："></a>方式三（显+隐式序列化）：</h3><blockquote>
+<p>实现 <strong>Serializable</strong> 接口 + 添加 <strong>writeObject()</strong> 和 <strong>readObject()</strong> 方法，显+隐式序列化。</p>
+<p>集合了方式一与方式二的优点。</p>
+<p>注意：</p>
+<ul>
+<li>不是重写或者覆盖，但是添加的这两个方法必须有相应的格式。</li>
+<li>方法必须要被 private 修饰，才能被调用。</li>
+<li>第一行调用默认的 defaultRead/WriteObject()</li>
+<li>调用 read/writeObject() 将需要操作的数据处理后赋给相应的字段</li>
+</ul>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 示例 pojo 类 */</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span> <span class="keyword">implements</span> <span class="title">Serializable</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">    <span class="keyword">private</span> String sex;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> age;</span><br><span class="line">    <span class="comment">/* 省略 set()、get()、toString() 方法 */</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">writeObject</span><span class="params">(ObjectOutputStream out)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        out.defaultWriteObject();</span><br><span class="line">        <span class="comment">/* 此处示例，对age进行+10操作 */</span></span><br><span class="line">        out.writeInt(age + <span class="number">10</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">readObject</span><span class="params">(ObjectInputStream in)</span> <span class="keyword">throws</span> ClassNotFoundException, IOException </span>&#123;</span><br><span class="line">        in.defaultReadObject();</span><br><span class="line">        age = in.readInt();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="序列化ID"><a href="#序列化ID" class="headerlink" title="序列化ID"></a>序列化ID</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// eg:</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> = serialVersionUID = <span class="number">1L</span>;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>两种策略<ul>
+<li>固定的 1L，随机生成一个不重复的 long 类型数据（实际上是使用 JDK 工具生成）。</li>
+<li>随机生成的序列化ID，通过改变序列化ID 可以用来限制某些用户的使用。</li>
+</ul>
+</li>
+</ul>
+<h2 id="敏感字段加密"><a href="#敏感字段加密" class="headerlink" title="敏感字段加密"></a>敏感字段加密</h2><p>在序列化过程中，虚拟机会试图调用对象里的 writeObject 和 readObject 方法，来进行用户自定义的序列化和反序列化。</p>
+<p>可在类中对 writeObject 和 readObject 方法进行续写，来针对敏感字段进行处理等操作，如 <strong>序列化方式三</strong> 中所示。</p>
+<p>亦可通过 Externalizable 来自定义实现序列化，如 <strong>序列化方式儿</strong> 中所示。</p>
+<h2 id="Transient-关键字"><a href="#Transient-关键字" class="headerlink" title="Transient 关键字"></a>Transient 关键字</h2><p>作用：避免所修饰的成员变量被序列化。</p>
+<p>生命周期：仅存在于调用者的内存，不会写入磁盘、缓冲区中致使其持久化。</p>
+<p>破解：实现 Extenalizable 接口，对 Transient 修饰的成员变量进行手动赋值序列化。</p>
+
+        </div>
+
+        <blockquote class="post-copyright">
+    
+    <div class="content">
+        
+<span class="post-time">
+    最后更新时间：<time datetime="2020-08-27T07:18:09.219Z" itemprop="dateUpdated">2020-08-27 15:18:09</time>
+</span><br>
+
+
+        
+        这里可以写作者留言，标签和 hexo 中所有变量及辅助函数等均可调用，示例：<a href="/2020/08/27/Java%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" target="_blank" rel="external">http://www.some-note.cn/2020/08/27/Java%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/</a>
+        
+    </div>
+    
+    <footer>
+        <a href="http://www.some-note.cn">
+            <img src="/img/avatar.jpg" alt="Sean">
+            Sean
+        </a>
+    </footer>
+</blockquote>
+
+        
+<div class="page-reward">
+    <a id="rewardBtn" href="javascript:;" class="page-reward-btn waves-effect waves-circle waves-light">赏</a>
+</div>
+
+
+
+        <div class="post-footer">
+            
+	<ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%BA%8F%E5%88%97%E5%8C%96/" rel="tag">序列化</a></li></ul>
+
+
+            
+<div class="page-share-wrap">
+    
+
+<div class="page-share" id="pageShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://www.some-note.cn/2020/08/27/Java%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/&title=《Java序列化与反序列化》 — Sean's Blog&pic=http://www.some-note.cn/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://www.some-note.cn/2020/08/27/Java%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/&title=《Java序列化与反序列化》 — Sean's Blog&source=何必那么认真" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://www.some-note.cn/2020/08/27/Java%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java序列化与反序列化》 — Sean's Blog&url=http://www.some-note.cn/2020/08/27/Java%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/&via=http://www.some-note.cn" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://www.some-note.cn/2020/08/27/Java%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+
+    <a href="javascript:;" id="shareFab" class="page-share-fab waves-effect waves-circle">
+        <i class="icon icon-share-alt icon-lg"></i>
+    </a>
+</div>
+
+
+
+        </div>
+    </div>
+
+    
+<nav class="post-nav flex-row flex-justify-between flex-row-reverse">
+  
+
+  
+    <div class="waves-block waves-effect next">
+      <a href="/2020/08/20/Nginx-%E9%85%8D%E5%90%88Redis%E5%AF%B9%E6%89%80%E6%9C%89Tomcat%E5%81%9Asession%E5%85%B1%E4%BA%AB/" id="post-next" class="post-nav-link">
+        <div class="tips">Next <i class="icon icon-angle-right icon-lg icon-pl"></i></div>
+        <h4 class="title">Nginx-配合Redis对所有Tomcat做session共享</h4>
+      </a>
+    </div>
+  
+</nav>
+
+
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</article>
+
+<div id="reward" class="page-modal reward-lay">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <h3 class="reward-title">
+        <i class="icon icon-quote-left"></i>
+        谢谢大爷~
+        <i class="icon icon-quote-right"></i>
+    </h3>
+    <div class="reward-content">
+        
+        <div class="reward-code">
+            <img id="rewardCode" src="/img/wechat.jpg" alt="打赏二维码">
+        </div>
+        
+        <label class="reward-toggle">
+            <input id="rewardToggle" type="checkbox" class="reward-toggle-check"
+                data-wechat="/img/wechat.jpg" data-alipay="/img/alipay.jpg">
+            <div class="reward-toggle-ctrol">
+                <span class="reward-toggle-item wechat">微信</span>
+                <span class="reward-toggle-label"></span>
+                <span class="reward-toggle-item alipay">支付宝</span>
+            </div>
+        </label>
+        
+    </div>
+</div>
+
+
+
+</div>
+
+        <footer class="footer">
+    <div class="top">
+        
+<p>
+    <span id="busuanzi_container_site_uv" style='display:none'>
+        站点总访客数：<span id="busuanzi_value_site_uv"></span>
+    </span>
+    <span id="busuanzi_container_site_pv" style='display:none'>
+        站点总访问量：<span id="busuanzi_value_site_pv"></span>
+    </span>
+</p>
+
+
+        <p>
+            
+                <span><a href="/atom.xml" target="_blank" class="rss" title="rss"><i class="icon icon-lg icon-rss"></i></a></span>
+            
+            <span>博客内容遵循 <a rel="license noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" target="_blank">知识共享 署名 - 非商业性 - 相同方式共享 4.0 国际协议</a></span>
+        </p>
+    </div>
+    <div class="bottom">
+        <p><span>Sean &copy; 2020</span>
+            <span>
+                
+                Power by <a href="http://hexo.io/" target="_blank">Hexo</a> Theme <a href="https://github.com/yscoder/hexo-theme-indigo" target="_blank">indigo</a>
+            </span>
+        </p>
+    </div>
+</footer>
+
+    </main>
+    <div class="mask" id="mask"></div>
+<a href="javascript:;" id="gotop" class="waves-effect waves-circle waves-light"><span class="icon icon-lg icon-chevron-up"></span></a>
+
+
+
+<div class="global-share" id="globalShare">
+    <ul class="reset share-icons">
+      <li>
+        <a class="weibo share-sns" target="_blank" href="http://service.weibo.com/share/share.php?url=http://www.some-note.cn/2020/08/27/Java%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/&title=《Java序列化与反序列化》 — Sean's Blog&pic=http://www.some-note.cn/img/avatar.jpg" data-title="微博">
+          <i class="icon icon-weibo"></i>
+        </a>
+      </li>
+      <li>
+        <a class="weixin share-sns wxFab" href="javascript:;" data-title="微信">
+          <i class="icon icon-weixin"></i>
+        </a>
+      </li>
+      <li>
+        <a class="qq share-sns" target="_blank" href="http://connect.qq.com/widget/shareqq/index.html?url=http://www.some-note.cn/2020/08/27/Java%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/&title=《Java序列化与反序列化》 — Sean's Blog&source=何必那么认真" data-title=" QQ">
+          <i class="icon icon-qq"></i>
+        </a>
+      </li>
+      <li>
+        <a class="facebook share-sns" target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=http://www.some-note.cn/2020/08/27/Java%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" data-title=" Facebook">
+          <i class="icon icon-facebook"></i>
+        </a>
+      </li>
+      <li>
+        <a class="twitter share-sns" target="_blank" href="https://twitter.com/intent/tweet?text=《Java序列化与反序列化》 — Sean's Blog&url=http://www.some-note.cn/2020/08/27/Java%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/&via=http://www.some-note.cn" data-title=" Twitter">
+          <i class="icon icon-twitter"></i>
+        </a>
+      </li>
+      <li>
+        <a class="google share-sns" target="_blank" href="https://plus.google.com/share?url=http://www.some-note.cn/2020/08/27/Java%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" data-title=" Google+">
+          <i class="icon icon-google-plus"></i>
+        </a>
+      </li>
+    </ul>
+ </div>
+
+
+<div class="page-modal wx-share" id="wxShare">
+    <a class="close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <img src="//api.qrserver.com/v1/create-qr-code/?data=http://www.some-note.cn/2020/08/27/Java%E5%BA%8F%E5%88%97%E5%8C%96%E4%B8%8E%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96/" alt="微信分享二维码">
+</div>
+
+
+
+
+    <script src="//cdn.bootcss.com/node-waves/0.7.4/waves.min.js"></script>
+<script>
+var BLOG = { ROOT: '/', SHARE: true, REWARD: true };
+
+
+</script>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/main.min.js"></script>
+
+
+<div class="search-panel" id="search-panel">
+    <ul class="search-result" id="search-result"></ul>
+</div>
+<template id="search-tpl">
+<li class="item">
+    <a href="{path}" class="waves-block waves-effect">
+        <div class="title ellipsis" title="{title}">{title}</div>
+        <div class="flex-row flex-middle">
+            <div class="tags ellipsis">
+                {tags}
+            </div>
+            <time class="flex-col time">{date}</time>
+        </div>
+    </a>
+</li>
+</template>
+
+<script src="//unpkg.com/hexo-theme-material-indigo@latest/js/search.min.js" async></script>
+
+
+
+
+
+
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+<script>
+(function() {
+    var OriginTitile = document.title, titleTime;
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            document.title = '死鬼去哪里了！';
+            clearTimeout(titleTime);
+        } else {
+            document.title = '(つェ⊂)咦!又好了!';
+            titleTime = setTimeout(function() {
+                document.title = OriginTitile;
+            },2000);
+        }
+    });
+})();
+</script>
+
+
+
+</body>
+</html>
